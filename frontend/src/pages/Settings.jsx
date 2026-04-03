@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 import { 
   User, 
   Lock, 
@@ -18,6 +19,47 @@ import {
 const Settings = () => {
   const { user, logout } = useAuth();
   
+  const [name, setName] = useState(user?.name || '');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleUpdateUser = async () => {
+    try {
+      setIsUpdating(true);
+      const { data } = await api.put('/auth/me', { name });
+      alert('IDENTITY_NODE_UPDATED_SUCCESS');
+      // Update local storage/context if needed:
+      // Since we derived name from user?.name, the next reload or re-fetch will show it.
+    } catch (err) {
+      alert('ERROR: IDENTITY_SYNC_FAILURE');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      alert('ERROR: CIPHER_MISMATCH');
+      return;
+    }
+    try {
+      setIsUpdating(true);
+      await api.put('/auth/me/password', {
+        old_password: oldPassword,
+        new_password: newPassword
+      });
+      alert('CIPHER_ROTATION_COMPLETE');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      alert('ERROR: SECURITY_PROTOCOL_DENIED');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
   return (
     <div className="space-y-12 pb-32">
       {/* Header Symmetry */}
@@ -46,7 +88,7 @@ const Settings = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-3">
                       <label className="block text-[9px] uppercase font-black text-slate-400 ml-4 tracking-[0.4em] italic opacity-60">Full Name</label>
-                      <input type="text" defaultValue={user?.name || ''} 
+                      <input type="text" value={name} onChange={(e) => setName(e.target.value)} 
                         className="w-full bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-6 text-sm font-black text-slate-950 outline-none focus:border-blue-500 transition-all uppercase tracking-widest italic"/>
                     </div>
                     <div className="space-y-3">
@@ -56,8 +98,11 @@ const Settings = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-end">
-                    <button className="bg-slate-950 text-white px-12 py-6 rounded-[1.5rem] hover:bg-blue-600 transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-xl italic flex items-center gap-4">
-                      Update Node
+                    <button 
+                      onClick={handleUpdateUser}
+                      disabled={isUpdating}
+                      className="bg-slate-950 text-white px-12 py-6 rounded-[1.5rem] hover:bg-blue-600 transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-xl italic flex items-center gap-4 disabled:opacity-50">
+                      {isUpdating ? 'SYNCING...' : 'Update Node'}
                       <ChevronRight size={14} />
                     </button>
                   </div>
@@ -72,14 +117,20 @@ const Settings = () => {
                </div>
                <div className="p-12 space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <input type="password" placeholder="New Password" 
+                    <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} placeholder="Old Cipher" 
                       className="w-full bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-6 text-sm font-black text-slate-950 outline-none focus:border-amber-500 transition-all italic"/>
-                    <input type="password" placeholder="Confirm Password" 
+                    <div className="hidden md:block"></div>
+                    <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="New Cipher" 
+                      className="w-full bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-6 text-sm font-black text-slate-950 outline-none focus:border-amber-500 transition-all italic"/>
+                    <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Cipher" 
                       className="w-full bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-6 text-sm font-black text-slate-950 outline-none focus:border-amber-500 transition-all italic"/>
                   </div>
                   <div className="flex items-center justify-end">
-                    <button className="bg-white border border-slate-200 text-slate-950 px-12 py-6 rounded-[1.5rem] hover:bg-slate-50 transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-sm italic">
-                      Rotate Cipher
+                    <button 
+                      onClick={handleUpdatePassword}
+                      disabled={isUpdating}
+                      className="bg-white border border-slate-200 text-slate-950 px-12 py-6 rounded-[1.5rem] hover:bg-slate-50 transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-sm italic disabled:opacity-50">
+                      {isUpdating ? 'ROTATING...' : 'Rotate Cipher'}
                     </button>
                   </div>
                </div>

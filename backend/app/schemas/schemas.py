@@ -138,3 +138,11 @@ class BudgetCategoryResponse(BudgetCategoryBase):
     user_id: int
     class Config:
         from_attributes = True
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+class PasswordUpdate(BaseModel):
+    old_password: str
+    new_password: str

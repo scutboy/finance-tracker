@@ -44,3 +44,36 @@ def login_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordR
 @router.get("/me", response_model=schemas.UserResponse)
 def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+@router.put("/me", response_model=schemas.UserResponse)
+def update_user_me(
+    user_in: schemas.UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if user_in.email:
+        existing_user = db.query(models.User).filter(models.User.email == user_in.email).first()
+        if existing_user and existing_user.id != current_user.id:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        current_user.email = user_in.email
+    if user_in.name:
+        current_user.name = user_in.name
+    
+    db.add(current_user)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+@router.put("/me/password")
+def update_password_me(
+    pw_in: schemas.PasswordUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if not security.verify_password(pw_in.old_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Incorrect old password")
+    
+    current_user.password_hash = security.get_password_hash(pw_in.new_password)
+    db.add(current_user)
+    db.commit()
+    return {"message": "Password updated successfully"}

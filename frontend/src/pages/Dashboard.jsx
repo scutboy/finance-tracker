@@ -96,7 +96,7 @@ const Dashboard = () => {
           <>
             <MetricCard 
               title="Consolidated Inbound" 
-              amount={summary?.total_income || 0} 
+              amount={summary?.monthly_income || 0} 
               type="inflow"
               subtitle="Current Epoch Flux"
               icon={TrendingUp} 
@@ -105,7 +105,7 @@ const Dashboard = () => {
             />
             <MetricCard 
               title="Allocated Leakage" 
-              amount={summary?.total_expenses || 0} 
+              amount={summary?.monthly_expenses || 0} 
               type="outflow"
               subtitle="Operational Consumption"
               icon={TrendingDown} 
@@ -114,7 +114,7 @@ const Dashboard = () => {
             />
             <MetricCard 
               title="Capital Momentum" 
-              amount={(summary?.total_income || 0) - (summary?.total_expenses || 0)} 
+              amount={summary?.net_cash_flow || 0} 
               type="delta"
               subtitle="Systemic Surge Capacity"
               icon={Zap} 
@@ -139,7 +139,7 @@ const Dashboard = () => {
                   </div>
                </div>
                <div>
-                  <p className="text-8xl font-black tracking-tighter italic leading-none drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 origin-left">{formatCurrency(summary?.net_savings || 0)}</p>
+                  <p className="text-8xl font-black tracking-tighter italic leading-none drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 origin-left">{formatCurrency(summary?.total_saved || 0)}</p>
                   <p className="text-[12px] font-black text-slate-500 uppercase tracking-[0.6em] mt-10 italic leading-none opacity-60">Verified Liquid & Future Assets Locked</p>
                </div>
             </div>
@@ -171,13 +171,13 @@ const Dashboard = () => {
             <div className="space-y-10 flex-1">
                {isLoading ? (
                  [1,2,3].map(i => <div key={i} className="h-20 bg-slate-50 border border-slate-100 rounded-3xl animate-pulse"/>)
-               ) : summary?.recent_transactions?.length === 0 ? (
+               ) : summary?.recent_income?.length === 0 ? (
                  <div className="flex flex-col items-center justify-center h-full gap-8 opacity-20">
                     <CheckCircle2 size={64} className="text-slate-300" />
                     <p className="text-[11px] font-black uppercase tracking-[0.5em] italic">No detected flux anomalies</p>
                  </div>
                ) : (
-                 summary?.recent_transactions?.slice(0, 4).map((txn, idx) => (
+                 summary?.recent_income?.slice(0, 4).map((txn, idx) => (
                    <div key={idx} className="flex items-center justify-between group/item p-3 hover:bg-slate-50 rounded-[2rem] transition-all duration-500 cursor-default">
                       <div className="flex items-center gap-6">
                          <div className={`p-4 rounded-2xl shadow-sm transition-all duration-500 group-hover/item:scale-110 group-hover/item:rotate-12 ${txn.type === 'income' ? 'bg-emerald-50 text-emerald-500 border border-emerald-100 shadow-emerald-500/5' : 'bg-rose-50 text-rose-500 border border-rose-100 shadow-rose-500/5'}`}>

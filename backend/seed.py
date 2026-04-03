@@ -12,6 +12,7 @@ from app.db import models
 from app.core.security import get_password_hash
 
 def seed_db():
+    models.Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     
     # 1. User
@@ -28,6 +29,7 @@ def seed_db():
 
     # Clean existing data to avoid duplicates on re-run
     db.query(models.Expense).delete()
+    db.query(models.Income).delete()
     db.query(models.Debt).delete()
     db.query(models.SavingsGoal).delete()
     db.query(models.BudgetCategory).delete()
@@ -90,8 +92,31 @@ def seed_db():
         )
         db.add(expense)
 
+    # 6. Periodic Income over last 3 months
+    income_desc = [
+        ("Monthly Salary", models.IncomeCategoryEnum.salary, 850000), 
+        ("Freelance Project", models.IncomeCategoryEnum.freelance, 120000), 
+        ("Rental Property", models.IncomeCategoryEnum.rental, 45000),
+        ("Investment Dividends", models.IncomeCategoryEnum.investment, 15000)
+    ]
+
+    for desc, cat, amount in income_desc:
+        for i in range(3):
+            income_date = now - relativedelta(months=i)
+            # Adjust to 25th (start of pay cycle)
+            income_date = income_date.replace(day=25)
+            
+            income = models.Income(
+                user_id=user.id,
+                date=income_date,
+                description=desc,
+                amount=amount,
+                category=cat
+            )
+            db.add(income)
+
     db.commit()
-    print("Database seeded successfully with dummy data.")
+    print("Database seeded successfully with dummy data including income.")
     db.close()
 
 if __name__ == "__main__":
