@@ -21,20 +21,23 @@ const Layout = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
-      {/* Sidebar Domain */}
-      <div className="border-4 border-dashed border-emerald-500/20">
-         <Sidebar />
-      </div>
-      
-      {/* Primary Flux Core */}
-      <main className="flex-1 overflow-y-auto w-full max-w-7xl mx-auto p-16 custom-scrollbar border-4 border-dashed border-rose-500/20">
-        <header className="flex items-center justify-between mb-12">
+      <Sidebar />
+      <main className="flex-1 overflow-y-auto w-full max-w-7xl mx-auto p-16 custom-scrollbar relative">
+        <header className="flex items-center justify-between mb-16 px-4">
           <div className="flex items-center gap-5">
-            <div className="w-1 h-1 bg-blue-600 rounded-full animate-pulse"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic leading-none">Vantage v3.1 Logic Core</span>
+            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse shadow-lg shadow-blue-500/50"></div>
+            <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none opacity-80">Vantage Stable v3.1</span>
+          </div>
+          <div className="flex items-center gap-8">
+            <div className="flex flex-col items-end">
+              <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.5em] mb-1 italic">Status Hub</span>
+              <span className="text-[10px] font-black text-slate-950 uppercase tracking-[0.2em] italic">Operational System Active</span>
+            </div>
           </div>
         </header>
-        <Outlet />
+        <div className="px-4">
+           <Outlet />
+        </div>
       </main>
     </div>
   );
