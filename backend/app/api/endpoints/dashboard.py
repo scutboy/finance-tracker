@@ -35,6 +35,17 @@ def get_dashboard_summary(
     ).all()
     total_debt = sum(d.balance for d in active_debts)
     debt_breakdown = [{"name": d.name, "balance": d.balance} for d in active_debts]
+    
+    # Target Debt (Snowball default - lowest balance)
+    target_debt = None
+    if active_debts:
+        sorted_debts = sorted(active_debts, key=lambda d: d.balance)
+        target_debt = {
+            "id": sorted_debts[0].id,
+            "name": sorted_debts[0].name,
+            "balance": sorted_debts[0].balance,
+            "interest_rate": sorted_debts[0].interest_rate
+        }
 
     # ── Savings ───────────────────────────────────────────────────────────────
     goals = db.query(models.SavingsGoal).filter(
@@ -107,6 +118,7 @@ def get_dashboard_summary(
         "cash_flow": cash_flow,
         "savings_progress": savings_progress,
         "debt_breakdown": debt_breakdown,
+        "target_debt": target_debt,
         "recent_income": [
             {"description": i.description, "amount": i.amount, "category": i.category, "date": str(i.date)}
             for i in recent_income

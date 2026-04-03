@@ -6,7 +6,8 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, Legend
 } from 'recharts';
-import { Wallet, Landmark, TrendingDown, PiggyBank, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Wallet, Landmark, TrendingDown, PiggyBank, TrendingUp, ArrowUpRight, ArrowDownRight, Target, ShieldCheck } from 'lucide-react';
+import Confetti from 'react-confetti';
 
 const COLORS = ['#A32D2D', '#854F0B', '#185FA5', '#3B6D11', '#4A5568'];
 
@@ -54,13 +55,35 @@ const Dashboard = () => {
     net_worth = 0, total_debt = 0, total_saved = 0,
     monthly_expenses = 0, monthly_income = 0, net_cash_flow = 0,
     cash_flow = [], savings_progress = [], debt_breakdown = [],
-    recent_income = []
+    recent_income = [], target_debt = null
   } = summary;
 
   const chartData = [...cash_flow].reverse();
 
   return (
     <div className="space-y-8">
+      {/* ── Spotlight: Next Debt Target ───────────────────────────────────────── */}
+      {target_debt && (
+        <div className="bg-gradient-to-r from-red-600 to-rose-600 rounded-2xl p-6 shadow-lg shadow-red-200/50 flex flex-col md:flex-row items-start md:items-center justify-between text-white">
+          <div className="flex items-center gap-5">
+            <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
+              <Target size={32} className="text-white" />
+            </div>
+            <div>
+              <p className="font-semibold text-red-100 uppercase tracking-wider text-xs mb-1">Current Target: Priority Wipeout</p>
+              <h2 className="text-3xl font-black mb-1">Destroy the {target_debt.name}</h2>
+              <p className="text-red-50 max-w-md text-sm leading-relaxed">
+                Based on your Snowball strategy, pay the minimums on everything else and throw every extra Rupee at this balance.
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0 bg-white/10 p-4 rounded-xl border border-white/20 backdrop-blur-sm text-center md:text-right">
+            <p className="text-xs text-red-100 uppercase font-semibold">Remaining Balance</p>
+            <p className="text-2xl font-black">{formatCurrency(target_debt.balance)}</p>
+          </div>
+        </div>
+      )}
+
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
         <p className="text-gray-500 mt-1">Your complete financial overview.</p>
@@ -154,24 +177,61 @@ const Dashboard = () => {
       {savings_progress.length > 0 && (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h3 className="text-base font-bold text-gray-900 mb-5">Savings Goals Progress</h3>
-          <div className="space-y-5">
-            {savings_progress.map(goal => (
+          <div className="space-y-7">
+            {savings_progress.map(goal => {
+              const isEmergency = goal.name.toLowerCase().includes('emergency');
+              const oneMonth = isEmergency ? monthly_expenses : 0;
+              const threeMonths = isEmergency ? monthly_expenses * 3 : 0;
+              const sixMonths = isEmergency ? monthly_expenses * 6 : 0;
+
+              return (
               <div key={goal.name}>
                 <div className="flex justify-between items-end mb-1.5">
-                  <span className="font-semibold text-gray-800 text-sm">{goal.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-800 text-sm">{goal.name}</span>
+                    {isEmergency && <ShieldCheck size={16} className="text-green-500"/>}
+                  </div>
                   <div className="text-sm">
                     <span className="font-bold text-green-600">{formatCurrency(goal.current)}</span>
                     <span className="text-gray-400 mx-1">/</span>
                     <span className="text-gray-500">{formatCurrency(goal.target)}</span>
                   </div>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                  <div className="bg-green-500 h-2.5 rounded-full transition-all duration-1000"
+                
+                {/* Dynamically adjust max bar scale to show realistic milestones if Emergency */}
+                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden relative">
+                  <div className="bg-green-500 h-3 rounded-full transition-all duration-1000"
                     style={{ width: `${goal.percentage}%` }}/>
+                    
+                  {/* Dynamic Milestones based on Monthly Expense */}
+                  {isEmergency && monthly_expenses > 0 && (
+                    <>
+                      {(oneMonth / goal.target) * 100 < 90 && (
+                        <div className="absolute top-0 bottom-0 border-l-2 border-white/60" style={{ left: `${(oneMonth / goal.target) * 100}%` }} title="1 Month Buffer"></div>
+                      )}
+                      {(threeMonths / goal.target) * 100 < 90 && (
+                        <div className="absolute top-0 bottom-0 border-l-2 border-white/60" style={{ left: `${(threeMonths / goal.target) * 100}%` }} title="3 Months Buffer"></div>
+                      )}
+                      {(sixMonths / goal.target) * 100 < 90 && (
+                        <div className="absolute top-0 bottom-0 border-l-2 border-blue-400" style={{ left: `${(sixMonths / goal.target) * 100}%` }} title="6 Months Secure"></div>
+                      )}
+                    </>
+                  )}
                 </div>
-                <p className="text-right text-xs text-gray-400 mt-1">{goal.percentage.toFixed(1)}%</p>
+                <div className="flex justify-between items-center mt-1.5">
+                  {isEmergency && monthly_expenses > 0 ? (
+                    <div className="flex gap-4 text-[10px] text-gray-400 font-medium">
+                      <span>1M: {formatCurrency(oneMonth)}</span>
+                      <span>3M: {formatCurrency(threeMonths)}</span>
+                      <span className="text-blue-500/80">6M Target: {formatCurrency(sixMonths)}</span>
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
+                  <p className="text-xs text-gray-400 font-medium">{goal.percentage.toFixed(1)}%</p>
+                </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       )}
