@@ -131,7 +131,7 @@ const Debt = () => {
          <div className="bg-slate-950 rounded-[2rem] p-10 shadow-2xl border border-white/5 relative overflow-hidden group min-h-[300px] flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-rose-600/10 rounded-full blur-[100px] pointer-events-none transition-all duration-[4000ms]"></div>
             <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.4em] italic relative z-10">Combined Exposure Delta</p>
-            <p className="text-5xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(totalOutstanding)}</p>
+            <p className="text-4xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(totalOutstanding)}</p>
             <div className="relative z-10">
                <span className="text-[8px] font-black uppercase tracking-[0.6em] text-white/20 italic">THREAT_REDUCTION_ACTIVE</span>
             </div>
