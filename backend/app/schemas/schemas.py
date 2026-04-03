@@ -111,6 +111,7 @@ class GoalBase(BaseModel):
     target_amount: float
     current_amount: float = 0.0
     monthly_contribution: float
+    interest_rate: float = 0.0
     target_date: date
 
 class GoalCreate(GoalBase):

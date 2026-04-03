@@ -117,6 +117,7 @@ class SavingsGoal(Base):
     target_amount = Column(Float, nullable=False)
     current_amount = Column(Float, default=0.0)
     monthly_contribution = Column(Float, nullable=False)
+    interest_rate = Column(Float, default=0.0) # Annual interest rate
     target_date = Column(Date, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 

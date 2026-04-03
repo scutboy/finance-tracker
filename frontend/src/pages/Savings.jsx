@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 import { formatCurrency } from '../utils/formatters';
-import { Plus, Target, CalendarDays, Coins, Trash2, X, AlertCircle, PiggyBank, Pencil } from 'lucide-react';
-import { format, parseISO, differenceInMonths } from 'date-fns';
+import { Plus, Target, CalendarDays, Coins, Trash2, X, AlertCircle, PiggyBank, Pencil, TrendingUp, Info } from 'lucide-react';
+import { format, parseISO, differenceInMonths, addMonths } from 'date-fns';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 const GOAL_CATEGORIES = ['Emergency Fund', 'Child Education', 'Retirement', 'Property', 'Travel', 'Vehicle', 'Investment', 'Other'];
 
@@ -16,6 +17,7 @@ const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
     target_amount: editItem?.target_amount ?? '',
     current_amount: editItem?.current_amount ?? '0',
     monthly_contribution: editItem?.monthly_contribution ?? '',
+    interest_rate: editItem?.interest_rate ?? '0',
     target_date: editItem?.target_date || '',
   });
   const [error, setError] = useState('');
@@ -38,6 +40,7 @@ const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
       target_amount: parseFloat(form.target_amount),
       current_amount: parseFloat(form.current_amount || 0),
       monthly_contribution: parseFloat(form.monthly_contribution),
+      interest_rate: parseFloat(form.interest_rate || 0),
       target_date: form.target_date,
     });
   };
@@ -83,6 +86,11 @@ const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Target Date *</label>
               <input required type="date" value={form.target_date} onChange={e => set('target_date', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"/>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Interest Rate (%) <Info size={12} className="text-gray-400" title="Expected annual return if invested"/></label>
+              <input type="number" step="0.1" min="0" value={form.interest_rate} onChange={e => set('interest_rate', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500"/>
             </div>
           </div>
@@ -143,6 +151,66 @@ const ContributeModal = ({ goal, onClose, onSuccess }) => {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+};
+
+// ─── Compound Trajectory Component ──────────────────────────────────────────
+const CompoundTrajectory = ({ goal }) => {
+  const months = Math.min(60, differenceInMonths(parseISO(goal.target_date), new Date())); // Limit to 5 years for chart clarity
+  if (months < 2) return null;
+
+  const data = [];
+  let balanceNormal = goal.current_amount;
+  let balanceCompound = goal.current_amount;
+  const monthlyRate = (goal.interest_rate || 0) / 100 / 12;
+
+  for (let i = 0; i <= months; i++) {
+    const date = addMonths(new Date(), i);
+    data.push({
+      month: format(date, 'MMM yy'),
+      Savings: Math.round(balanceNormal),
+      Invested: Math.round(balanceCompound)
+    });
+    balanceNormal += goal.monthly_contribution;
+    balanceCompound = (balanceCompound + goal.monthly_contribution) * (1 + monthlyRate);
+  }
+
+  const wealthGained = balanceCompound - balanceNormal;
+
+  return (
+    <div className="mt-6 bg-gray-50/50 rounded-xl p-4 border border-gray-100">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+          <TrendingUp size={14} className="text-blue-500" /> Compound Projection (5 yrs)
+        </h4>
+        {wealthGained > 100 && (
+          <div className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+            Wealth Gain: +{formatCurrency(wealthGained)}
+          </div>
+        )}
+      </div>
+      <div className="h-32 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="colorInvested" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+            <XAxis dataKey="month" hide />
+            <YAxis hide domain={['auto', 'auto']} />
+            <Tooltip 
+              formatter={(val) => formatCurrency(val)}
+              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 10px rgb(0 0 0 / 0.1)', fontSize: '10px' }}
+            />
+            <Area type="monotone" dataKey="Savings" stroke="#94a3b8" fill="transparent" strokeWidth={1} strokeDasharray="4 4" dot={false} />
+            <Area type="monotone" dataKey="Invested" stroke="#3b82f6" fillOpacity={1} fill="url(#colorInvested)" strokeWidth={2} dot={false} />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
@@ -270,6 +338,11 @@ const Savings = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Compound Projection for long term goals */}
+                {(goal.category.includes('Education') || goal.category.includes('Retirement') || goal.interest_rate > 0) && (
+                  <CompoundTrajectory goal={goal} />
+                )}
 
                 <button onClick={() => setContributeGoal(goal)}
                   className="mt-4 w-full py-2 text-sm font-medium text-green-600 border border-green-500 rounded-lg hover:bg-green-50 transition">

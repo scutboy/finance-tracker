@@ -24,7 +24,57 @@ const MetricCard = ({ title, amount, icon, isNegative = false, subtitle = null }
   </div>
 );
 
+const SweeperModal = ({ surplus, onClose, targetDebt, emergencyGoal }) => {
+  const debtAlloc = Math.round(surplus * 0.4);
+  const savingsAlloc = Math.round(surplus * 0.6);
+
+  return (
+    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-green-600 p-8 text-white text-center relative">
+          <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white transition"><X size={20}/></button>
+          <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
+            <TrendingUp size={32} />
+          </div>
+          <h2 className="text-2xl font-black italic">SURPLUS DETECTED!</h2>
+          <p className="text-green-100 font-medium">You have {formatCurrency(surplus)} leftover this cycle.</p>
+        </div>
+        <div className="p-8 space-y-6">
+          <p className="text-gray-600 text-sm leading-relaxed text-center">
+            Don't let it sit! Your smart swept plan allocates this to achieve your goals faster:
+          </p>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <div className="bg-red-100 text-red-600 p-2 rounded-lg"><Target size={18}/></div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase font-bold text-gray-400">Debt Sniper (40%)</p>
+                <p className="text-sm font-bold text-gray-800">Pay off {targetDebt?.name || 'highest balance'}</p>
+              </div>
+              <p className="font-black text-red-600">{formatCurrency(debtAlloc)}</p>
+            </div>
+            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <div className="bg-blue-100 text-blue-600 p-2 rounded-lg"><ShieldCheck size={18}/></div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase font-bold text-gray-400">Future Fund (60%)</p>
+                <p className="text-sm font-bold text-gray-800">Into Emergency Fund</p>
+              </div>
+              <p className="font-black text-blue-600">{formatCurrency(savingsAlloc)}</p>
+            </div>
+          </div>
+          <div className="space-y-3 pt-2">
+            <button onClick={onClose} className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]">
+              LOG PAYMENTS NOW
+            </button>
+            <p className="text-center text-[10px] text-gray-400 uppercase font-bold tracking-widest">or manually allocate later</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard = () => {
+  const [showSweeper, setShowSweeper] = React.useState(false);
   const { data: summary, isLoading, isError } = useQuery({
     queryKey: ['dashboardSummary'],
     queryFn: async () => (await api.get('/dashboard/summary')).data,
@@ -59,10 +109,26 @@ const Dashboard = () => {
   } = summary;
 
   const chartData = [...cash_flow].reverse();
+  const hasSurplus = net_cash_flow > 1000; // Only trigger for meaningful surplus
 
   return (
     <div className="space-y-8">
       {/* ── Spotlight: Next Debt Target ───────────────────────────────────────── */}
+      {hasSurplus && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between animate-bounce-subtle">
+           <div className="flex items-center gap-3">
+             <div className="p-2 bg-green-100 text-green-700 rounded-lg"><ArrowUpRight size={20}/></div>
+             <div>
+               <p className="text-sm font-bold text-green-800">You have a {formatCurrency(net_cash_flow)} surplus!</p>
+               <p className="text-xs text-green-600">Put this money to work before it disappears.</p>
+             </div>
+           </div>
+           <button onClick={() => setShowSweeper(true)} className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 transition shadow-sm">
+             SWEEP NOW
+           </button>
+        </div>
+      )}
+
       {target_debt && (
         <div className="bg-gradient-to-r from-red-600 to-rose-600 rounded-2xl p-6 shadow-lg shadow-red-200/50 flex flex-col md:flex-row items-start md:items-center justify-between text-white">
           <div className="flex items-center gap-5">
@@ -252,6 +318,15 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
+      )}
+      {/* ── Modals ────────────────────────────────────────────────────────────── */}
+      {showSweeper && (
+        <SweeperModal 
+          surplus={net_cash_flow} 
+          onClose={() => setShowSweeper(false)} 
+          targetDebt={target_debt}
+          emergencyGoal={savings_progress.find(g => g.name.toLowerCase().includes('emergency'))}
+        />
       )}
     </div>
   );
