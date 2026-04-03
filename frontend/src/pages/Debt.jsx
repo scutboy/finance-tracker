@@ -200,8 +200,8 @@ const Debt = () => {
          </div>
       </div>
 
-      {formModal.open && <DebtFormModal editItem={formModal.editItem} onClose={() => setFormModal({ open: false, editItem: null })} onSuccess={() => queryClient.invalidateQueries(['debts'])} />}
-      {paymentModal.open && <PaymentModal debt={paymentModal.debt} onClose={() => setPaymentModal({ open: false, debt: null })} onSuccess={() => { queryClient.invalidateQueries(['debts']); queryClient.invalidateQueries(['dashboardSummary']); }} />}
+      {formModal.open && <DebtFormModal editItem={formModal.editItem} onClose={() => setFormModal({ open: false, editItem: null })} onSuccess={() => { queryClient.invalidateQueries({ queryKey: ['debts'] }); queryClient.invalidateQueries({ queryKey: ['debtProjection'] }); }} />}
+      {paymentModal.open && <PaymentModal debt={paymentModal.debt} onClose={() => setPaymentModal({ open: false, debt: null })} onSuccess={() => { queryClient.invalidateQueries({ queryKey: ['debts'] }); queryClient.invalidateQueries({ queryKey: ['debtProjection'] }); queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] }); }} />}
     </div>
   );
 };
