@@ -10,11 +10,11 @@ import Dashboard from './pages/Dashboard';
 const queryClient = new QueryClient();
 
 function App() {
-  console.log("[App] Vantage v3 Stable Routing Active...");
+  console.log("[App] Vantage v3 Mounting Stable Hierarchy...");
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -24,9 +24,9 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
-        </Router>
-      </AuthProvider>
-    </QueryClientProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </Router>
   );
 }
 
