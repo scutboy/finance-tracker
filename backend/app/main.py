@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api import api_router
 
+print("--- FASTAPI SERVER STARTING ---")
 app = FastAPI(title=settings.PROJECT_NAME)
 
 app.add_middleware(
