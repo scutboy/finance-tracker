@@ -21,37 +21,34 @@ import {
 import { useAuth } from '../context/AuthContext';
 
 // ─── Metric Card Component ───────────────────────────────────────────────────
-const MetricCard = ({ title, amount, type, subtitle, icon: Icon, colorClass, gradientClass }) => (
-  <div className={`relative bg-white rounded-[4rem] p-16 shadow-sm border border-slate-200/50 group overflow-hidden transition-all duration-700 hover:shadow-3xl hover:scale-[1.02] flex flex-col justify-between min-h-[380px]`}>
-    {/* Decorative Background Layer */}
-    <div className={`absolute top-0 right-0 w-[400px] h-[400px] rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-all duration-1000 -mr-48 -mt-48 ${gradientClass}`}></div>
-    
-    <div className="relative z-10 flex justify-between items-start mb-8">
-      <div>
-         <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.5em] italic mb-3 opacity-60 leading-none">{title}</p>
-         <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] italic leading-none">{subtitle}</h4>
+const MetricCard = ({ title, amount, subtitle, icon: Icon, colorClass, gradientClass, type }) => {
+  return (
+    <div className={`relative group overflow-hidden bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-700 p-8 flex flex-col justify-between min-h-[200px]`}>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-6">
+          <div className={`p-3 rounded-2xl ${gradientClass} transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 shadow-sm border border-slate-50`}>
+            <Icon className={colorClass} size={22} />
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.4em] mb-1 italic">Vantage Engine</span>
+            <span className="text-[9px] font-black text-slate-950 uppercase tracking-[0.2em] italic">Active Sync</span>
+          </div>
+        </div>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-3 italic opacity-60 ml-1">{title}</p>
+        <div className="flex items-baseline gap-2">
+          <h3 className="text-3xl font-black text-slate-950 tracking-tighter italic leading-none group-hover:scale-105 transition-transform duration-500 origin-left">
+            {formatCurrency(amount)}
+          </h3>
+        </div>
       </div>
-      <div className={`p-6 rounded-[2.5rem] bg-slate-50 border border-slate-100 transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 shadow-sm ${colorClass}`}>
-        <Icon size={32} />
+      <div className="relative z-10 pt-4 border-t border-slate-50 flex items-center justify-between mt-auto">
+        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] italic opacity-40">{subtitle}</p>
+        <ChevronRight size={14} className="text-slate-300 group-hover:translate-x-1 transition-all" />
       </div>
     </div>
-
-    <div className="relative z-10 space-y-4">
-      <p className="text-6xl font-black text-slate-950 tracking-tighter italic leading-none group-hover:scale-105 transition-transform origin-left duration-500 drop-shadow-sm">{formatCurrency(amount)}</p>
-      <div className="flex items-center gap-4">
-         <div className={`w-2 h-2 rounded-full animate-pulse shadow-lg ${type === 'inflow' ? 'bg-emerald-500 shadow-emerald-500/50' : type === 'outflow' ? 'bg-rose-500 shadow-rose-500/50' : 'bg-blue-500 shadow-blue-500/50'}`}></div>
-         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none">Status: PERSISTENT_TRACE_STABLE</p>
-      </div>
-    </div>
-
-    <div className="relative z-10 mt-14 pt-10 border-t border-slate-50 flex items-center justify-between">
-       <button className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] hover:text-blue-600 transition-colors italic group/btn">
-         Expand Node <ChevronRight size={14} className="group-hover/btn:translate-x-2 transition-transform" />
-       </button>
-       <span className="text-[8px] font-black text-slate-200 uppercase tracking-[0.6em] italic">VANTAGE_v3.1_NODE</span>
-    </div>
-  </div>
-);
+  );
+};
 
 // ─── Dashboard Main ──────────────────────────────────────────────────────────
 const Dashboard = () => {
@@ -66,18 +63,14 @@ const Dashboard = () => {
   return (
     <div className="space-y-20 pb-40 max-w-7xl mx-auto">
       {/* Dynamic Command Header */}
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-12 px-6">
-        <div className="space-y-8 animate-fade-in">
-           <div className="flex items-center gap-5 mb-2">
-              <span className="bg-slate-950 text-white text-[9px] font-black uppercase tracking-[0.4em] px-4 py-2 rounded-full shadow-2xl shadow-slate-900/40 italic">System Core: Operational</span>
-              <span className="text-slate-300 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 ml-2 italic">Global Node: {firstName.toUpperCase()}_PERSISTENT</span>
-           </div>
-           <div>
-              <h1 className="text-7xl font-black tracking-tighter text-slate-950 uppercase italic leading-none mb-6">Hello, {firstName}</h1>
-              <p className="text-slate-400 font-bold text-sm uppercase tracking-[0.3em] opacity-60 leading-[2.5] max-w-3xl italic ml-1">
-                Real-time analytical monitoring of the global financial flux. System load: Nominal. All security protocols and asset targets locked.
-              </p>
-           </div>
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+             <span className="bg-slate-950 text-white text-[9px] font-black uppercase tracking-[0.4em] px-4 py-2 rounded-full italic">Status: Online</span>
+             <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 italic underline-offset-8 decoration-1 decoration-slate-200">Terminal ID: LKR-001</span>
+          </div>
+          <h1 className="text-5xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Console</h1>
+          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 leading-none italic ml-1">Real-time systemic oversight.</p>
         </div>
         <div className="flex items-center gap-8 p-6 bg-white border border-slate-100 rounded-[3rem] shadow-2xl hover:shadow-3xl transition-all duration-700 min-w-[320px] group">
            <div className="p-6 bg-blue-50 text-blue-600 rounded-full group-hover:scale-110 transition-transform"><Activity size={28} className="animate-pulse" /></div>
@@ -89,9 +82,9 @@ const Dashboard = () => {
       </div>
 
       {/* Primary Flux Matrix Tiles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 px-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 px-6">
         {isLoading ? (
-          [1,2,3].map(i => <div key={i} className="h-[380px] bg-white border border-slate-100 rounded-[4rem] animate-pulse"/>)
+          [1,2,3].map(i => <div key={i} className="h-[220px] bg-white border border-slate-100 rounded-[2rem] animate-pulse"/>)
         ) : (
           <>
             <MetricCard 
@@ -100,8 +93,8 @@ const Dashboard = () => {
               type="inflow"
               subtitle="Current Epoch Flux"
               icon={TrendingUp} 
-              colorClass="text-emerald-500 group-hover:text-emerald-600"
-              gradientClass="bg-emerald-500/[0.08]"
+              colorClass="text-emerald-500"
+              gradientClass="bg-emerald-50"
             />
             <MetricCard 
               title="Allocated Leakage" 
@@ -109,8 +102,8 @@ const Dashboard = () => {
               type="outflow"
               subtitle="Operational Consumption"
               icon={TrendingDown} 
-              colorClass="text-rose-500 group-hover:text-rose-600"
-              gradientClass="bg-rose-500/[0.08]"
+              colorClass="text-rose-500"
+              gradientClass="bg-rose-50"
             />
             <MetricCard 
               title="Capital Momentum" 
@@ -118,8 +111,8 @@ const Dashboard = () => {
               type="delta"
               subtitle="Systemic Surge Capacity"
               icon={Zap} 
-              colorClass="text-amber-500 group-hover:text-amber-600"
-              gradientClass="bg-amber-500/[0.08]"
+              colorClass="text-amber-500"
+              gradientClass="bg-amber-50"
             />
           </>
         )}
@@ -128,7 +121,7 @@ const Dashboard = () => {
       {/* System Integrity & Trace Layer */}
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-12 px-6">
          {/* Asset Resilience Stats */}
-         <div className="xl:col-span-3 bg-slate-950 rounded-[5rem] p-20 shadow-4xl text-white relative overflow-hidden group hover:scale-[1.01] transition-transform duration-1000 min-h-[450px] flex flex-col justify-between">
+         <div className="xl:col-span-3 bg-slate-950 rounded-[2rem] p-12 shadow-4xl text-white relative overflow-hidden group hover:scale-[1.01] transition-transform duration-1000 min-h-[450px] flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none group-hover:scale-125 transition-all duration-[5000ms]"></div>
             <div className="relative z-10 space-y-10">
                <div className="flex items-center gap-6">
@@ -138,10 +131,19 @@ const Dashboard = () => {
                     <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.5em] italic">Consolidated Net Resilience Matrix</p>
                   </div>
                </div>
-               <div>
-                  <p className="text-8xl font-black tracking-tighter italic leading-none drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 origin-left">{formatCurrency(summary?.total_saved || 0)}</p>
-                  <p className="text-[12px] font-black text-slate-500 uppercase tracking-[0.6em] mt-10 italic leading-none opacity-60">Verified Liquid & Future Assets Locked</p>
+               <div className="bg-emerald-50/50 rounded-[2rem] border border-emerald-100/50 p-10 flex flex-col justify-between min-h-[220px] group transition-all duration-700 hover:bg-emerald-500/10 hover:shadow-2xl hover:shadow-emerald-500/20 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 group-hover:scale-150 transition-transform duration-1000 blur-3xl"></div>
+               <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-6">
+                     <div className="p-4 bg-white text-emerald-500 rounded-2xl shadow-xl shadow-emerald-500/5 group-hover:rotate-12 transition-transform border border-emerald-50"><TrendingUp size={24} /></div>
+                     <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tighter italic">Savings Core</h3>
+                  </div>
                </div>
+               <div>
+                  <p className="text-5xl font-black tracking-tighter italic leading-none drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 origin-left">{formatCurrency(summary?.total_saved || 0)}</p>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mt-8 italic leading-none opacity-60">Verified Liquid & Future Assets Locked</p>
+               </div>
+            </div>
             </div>
             <div className="relative z-10 flex items-center justify-between pt-12 border-t border-white/5">
                 <div className="flex items-center gap-6">
@@ -159,7 +161,7 @@ const Dashboard = () => {
          </div>
 
          {/* Protocol Trace Timeline (Recent) */}
-         <div className="xl:col-span-2 bg-white rounded-[5rem] p-16 shadow-sm border border-slate-100 group hover:shadow-3xl transition-all duration-700 flex flex-col min-h-[450px]">
+         <div className="xl:col-span-2 bg-white rounded-[2rem] p-10 shadow-sm border border-slate-100 group hover:shadow-3xl transition-all duration-700 flex flex-col min-h-[450px]">
             <div className="flex items-center justify-between mb-16">
                <div className="flex items-center gap-6">
                   <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-blue-50 transition-colors duration-500 shadow-inner group-hover:shadow-blue-500/10 border border-transparent group-hover:border-blue-100"><History size={28} className="text-slate-300 group-hover:text-blue-500 transition-colors" /></div>
