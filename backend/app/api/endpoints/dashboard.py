@@ -15,7 +15,18 @@ def get_dashboard_summary(
     current_user: models.User = Depends(get_current_user)
 ):
     now = datetime.utcnow()
-    month_start = datetime(now.year, now.month, 1).date()
+    
+    # ── Pay-Cycle Calculation ────────────────────────────────────────────────
+    # The financial month starts on the 25th and ends on the 24th of the next month.
+    if now.day >= 25:
+        # We are past the 25th, so the cycle started this month
+        cycle_start = datetime(now.year, now.month, 25).date()
+    else:
+        # We are before the 25th, so the cycle started last month
+        if now.month == 1:
+            cycle_start = datetime(now.year - 1, 12, 25).date()
+        else:
+            cycle_start = datetime(now.year, now.month - 1, 25).date()
 
     # ── Debt ──────────────────────────────────────────────────────────────────
     active_debts = db.query(models.Debt).filter(
@@ -45,12 +56,12 @@ def get_dashboard_summary(
     # ── This Month's Expenses & Income ───────────────────────────────────────
     current_month_expenses = db.query(func.sum(models.Expense.amount)).filter(
         models.Expense.user_id == current_user.id,
-        models.Expense.date >= month_start
+        models.Expense.date >= cycle_start
     ).scalar() or 0.0
 
     current_month_income = db.query(func.sum(models.Income.amount)).filter(
         models.Income.user_id == current_user.id,
-        models.Income.date >= month_start
+        models.Income.date >= cycle_start
     ).scalar() or 0.0
 
     net_cash_flow = current_month_income - current_month_expenses
