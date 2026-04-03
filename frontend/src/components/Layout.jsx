@@ -20,27 +20,32 @@ const Layout = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      {/* Sidebar Section */}
-      <Sidebar />
-      
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-white/50 backdrop-blur-3xl custom-scrollbar relative">
-        {/* Simple Header for verification */}
-        <header className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white/80 sticky top-0 z-50">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Protocol</span>
-            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest italic">{window.location.pathname.replace('/','') || 'Dashboard'}</span>
-          </div>
-          <button onClick={logout} className="text-[10px] font-bold text-rose-400 uppercase tracking-[0.2em] hover:text-rose-600 transition-colors flex items-center gap-2">
-             <LogOut size={14} />
-             Session Terminate
-          </button>
-        </header>
+    <div className="flex flex-col h-screen overflow-hidden bg-slate-50">
+      <div className="bg-rose-600 text-white text-[9px] font-black uppercase tracking-[0.5em] py-2 px-8 text-center sticky top-0 z-[9999]">
+         Vantage Debug: User={user?.email} | Name={user?.name} | Path={window.location.pathname}
+      </div>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar Section */}
+        <Sidebar />
+        
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-white/50 backdrop-blur-3xl custom-scrollbar relative">
+          {/* Simple Header for verification */}
+          <header className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white/80 sticky top-0 z-50">
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Protocol</span>
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest italic">{window.location.pathname.replace('/','') || 'Dashboard'}</span>
+            </div>
+            <button onClick={logout} className="text-[10px] font-bold text-rose-400 uppercase tracking-[0.2em] hover:text-rose-600 transition-colors flex items-center gap-2">
+               <LogOut size={14} />
+               Session Terminate
+            </button>
+          </header>
 
-        <main className="flex-1 p-8 md:p-12">
-            <Outlet />
-        </main>
+          <main className="flex-1 p-8 md:p-12">
+              <Outlet />
+          </main>
+        </div>
       </div>
     </div>
   );
