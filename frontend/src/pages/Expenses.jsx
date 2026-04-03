@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 import { formatCurrency } from '../utils/formatters';
-import { Plus, Receipt, Upload, Search, Trash2, FileText, FileSpreadsheet, X, CheckCircle2, AlertCircle, Pencil } from 'lucide-react';
+import { Plus, Receipt, Upload, Search, Trash2, FileText, FileSpreadsheet, X, CheckCircle2, AlertCircle, Pencil, TrendingDown, ArrowDownRight } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 const CATEGORIES = [
@@ -40,52 +40,58 @@ const ExpenseFormModal = ({ editItem = null, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">{isEdit ? 'Edit Expense' : 'Add Expense'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100"><X size={20}/></button>
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white/20">
+        <div className="flex items-center justify-between p-12 border-b border-slate-50 bg-slate-50/50">
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">{isEdit ? 'Refine Leak' : 'Manual Flux Exit'}</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-100 transition-all"><X size={24}/></button>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-sm"><AlertCircle size={16}/>{error}</div>}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
-              <input required type="date" value={form.date} onChange={e => set('date', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"/>
+        <form onSubmit={handleSubmit} className="p-12 space-y-8">
+          {error && <div className="flex items-center gap-3 bg-rose-50 text-rose-600 p-5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-rose-100"><AlertCircle size={18}/>{error}</div>}
+          
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Exit Timestamp</label>
+                <input required type="date" value={form.date} onChange={e => set('date', e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all"/>
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Valuation (Rs)</label>
+                <input required type="number" min="0.01" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all italic"/>
+              </div>
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Amount (Rs) *</label>
-              <input required type="number" min="0.01" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"/>
+              <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Leak Narrative</label>
+              <input required value={form.description} onChange={e => set('description', e.target.value)}
+                placeholder="e.g. Mandatory Consumption"
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all"/>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Sector Class</label>
+                <select required value={form.category} onChange={e => set('category', e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all">
+                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Source Node</label>
+                <input value={form.account} onChange={e => set('account', e.target.value)}
+                  placeholder="e.g. Cash, Card"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all"/>
+              </div>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-            <input required value={form.description} onChange={e => set('description', e.target.value)}
-              placeholder="e.g. Keells Super, Uber ride"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"/>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-              <select required value={form.category} onChange={e => set('category', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 bg-white">
-                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Account / Card</label>
-              <input value={form.account} onChange={e => set('account', e.target.value)}
-                placeholder="e.g. BOC Card, Cash"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"/>
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
+            <button type="button" onClick={onClose} className="px-8 py-5 text-slate-400 hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-all">Abort Sync</button>
             <button type="submit" disabled={mutation.isPending}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium disabled:opacity-50">
-              {mutation.isPending ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Expense'}
+              className="px-10 py-5 bg-slate-900 text-white rounded-2xl hover:bg-black transition-all font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-50">
+              {mutation.isPending ? 'Syncing...' : 'Lock Exit Node'}
             </button>
           </div>
         </form>
@@ -151,143 +157,149 @@ const UploadModal = ({ onClose, onSuccess }) => {
   const FileIcon = file?.name?.endsWith('.pdf') ? FileText : FileSpreadsheet;
 
   return (
-    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-[3.5rem] shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-white/20">
+        <div className="p-12 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Import Bank Statement</h2>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {step === 'upload' && 'Upload a PDF or CSV statement'}
-              {step === 'preview' && `${parsedData?.count || 0} transactions found — review before saving`}
-              {step === 'success' && 'All done!'}
-            </p>
+             <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic leading-none mb-2">Automated Flux Sync</h2>
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] opacity-60">High-Precision Auditor Mode</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100"><X size={20}/></button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-900 p-3 rounded-2xl hover:bg-slate-100 transition-all"><X size={28}/></button>
         </div>
-        <div className="flex-1 overflow-y-auto p-6">
+        
+        <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
           {step === 'upload' && (
-            <div className="space-y-5">
+            <div className="space-y-12">
               <div
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
                 onClick={() => document.getElementById('stmt-file-input').click()}
-                className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'}`}
+                className={`border-4 border-dashed rounded-[3rem] p-32 text-center cursor-pointer transition-all duration-500 scale-100 hover:scale-[1.01] ${
+                   dragOver 
+                     ? 'border-blue-600 bg-blue-50/50' 
+                     : 'border-slate-100 bg-slate-50/30 hover:border-blue-400 hover:bg-slate-50'
+                }`}
               >
                 <input id="stmt-file-input" type="file" accept=".pdf,.csv" className="hidden"
                   onChange={(e) => { const f = e.target.files[0]; if (f) setFile(f); }}/>
                 {file ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <FileIcon size={40} className="text-blue-500"/>
-                    <p className="font-semibold text-gray-900">{file.name}</p>
-                    <p className="text-sm text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
-                    <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="text-xs text-red-500 hover:underline mt-1">Remove</button>
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="p-8 bg-blue-100 text-blue-600 rounded-3xl animate-bounce-subtle"><FileIcon size={64}/></div>
+                    <div>
+                      <p className="font-black text-slate-900 text-2xl tracking-tighter uppercase italic">{file.name}</p>
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] mt-3 italic opacity-60">Payload Ready for Execution</p>
+                    </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-3 pointer-events-none">
-                    <Upload size={40} className="text-gray-300"/>
+                  <div className="flex flex-col items-center gap-8 opacity-20 group">
+                    <Upload size={80} className="text-slate-400 group-hover:scale-110 transition-transform group-hover:text-blue-600"/>
                     <div>
-                      <p className="font-semibold text-gray-700">Drag & drop your statement here</p>
-                      <p className="text-sm text-gray-400 mt-1">PDF or CSV — max 20 MB</p>
+                      <p className="font-black text-slate-950 text-3xl tracking-tighter uppercase italic">Inject Statement</p>
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] mt-4">PDF / CSV Matrix Accepted</p>
                     </div>
                   </div>
                 )}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Account / Card Name (optional)</label>
+              <div className="px-2">
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-4 tracking-[0.3em] opacity-80 ml-1">Assign Source Target Identity</label>
                 <input type="text" value={accountName} onChange={e => setAccountName(e.target.value)}
-                  placeholder="e.g. BOC Credit Card, Sampath Savings"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
+                  placeholder="e.g. BOC MAIN DEBIT CORE"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-10 py-6 text-base font-black text-slate-950 outline-none focus:ring-8 focus:ring-blue-500/5 focus:border-blue-500 transition-all uppercase tracking-widest placeholder:opacity-20"/>
               </div>
-              {error && <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-600"><AlertCircle size={16} className="shrink-0 mt-0.5"/>{error}</div>}
             </div>
           )}
 
           {step === 'preview' && parsedData && (
-            <div className="space-y-4">
-              {parsedData.count === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <AlertCircle size={40} className="mx-auto text-gray-300 mb-3"/>
-                  <p className="font-medium text-gray-700">No transactions could be extracted</p>
-                  <button onClick={() => { setStep('upload'); setFile(null); }} className="mt-4 text-blue-600 text-sm underline">Try another file</button>
+            <div className="space-y-10">
+              <div className="flex justify-between items-end px-4">
+                <div>
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-2 opacity-60 leading-none">Detected Cluster</p>
+                   <p className="text-2xl font-black text-slate-900 italic tracking-tighter">{parsedData.count} Entities Logged</p>
                 </div>
-              ) : (
-                <>
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-gray-500"><span className="font-bold text-gray-900">{confirmCount}</span> of {parsedData.count} selected</p>
-                    <button onClick={toggleAll} className="text-sm text-blue-600 hover:underline font-medium">
-                      {Object.values(selected).every(Boolean) ? 'Deselect all' : 'Select all'}
-                    </button>
-                  </div>
-                  <div className="border border-gray-200 rounded-xl overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-100 text-sm">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-3 py-3 w-8"/>
-                          <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Date</th>
-                          <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Description</th>
-                          <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Category</th>
-                          <th className="px-3 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Amount</th>
+                <button onClick={toggleAll} className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] hover:text-blue-950 transition-colors bg-blue-50 px-4 py-2 rounded-xl">
+                  {Object.values(selected).every(Boolean) ? 'Deselect Absolute' : 'Select Complete Node'}
+                </button>
+              </div>
+              
+              <div className="bg-slate-50 rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm shadow-inner transition-all hover:bg-white">
+                <table className="min-w-full">
+                  <thead className="bg-slate-100/50">
+                    <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">
+                      <th className="p-8 w-16 text-center">Sel</th>
+                      <th className="p-8 text-left">Sync Time</th>
+                      <th className="p-8 text-left">Influx Delta Narrative</th>
+                      <th className="p-8 text-left">Sector</th>
+                      <th className="p-8 text-right">Valuation</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {parsedData.transactions.map((txn, i) => {
+                      const cur = { ...txn, ...(editing[i] || {}) };
+                      return (
+                        <tr key={i} className={`transition-all ${selected[i] ? 'bg-white group' : 'opacity-20 grayscale scale-[0.98]'}`}>
+                          <td className="p-8 text-center cursor-pointer" onClick={() => setSelected(p => ({ ...p, [i]: !p[i] }))}>
+                             <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center mx-auto transition-all ${selected[i] ? 'bg-emerald-500 border-emerald-500 text-white shadow-xl rotate-12' : 'bg-white border-slate-200'}`}>
+                                {selected[i] && <CheckCircle2 size={16}/>}
+                             </div>
+                          </td>
+                          <td className="p-8 whitespace-nowrap text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] italic">{format(parseISO(cur.date), 'dd MMM yy')}</td>
+                          <td className="p-8">
+                            <input type="text" value={cur.description}
+                              onChange={e => setEditing(p => ({ ...p, [i]: { ...(p[i]||{}), description: e.target.value } }))}
+                              className="w-full bg-transparent border-b-2 border-transparent hover:border-slate-100 focus:border-blue-500 focus:outline-none py-2 text-slate-900 font-black text-sm uppercase italic tracking-tight placeholder:opacity-20"/>
+                          </td>
+                          <td className="p-8">
+                            <select value={cur.category}
+                              onChange={e => setEditing(p => ({ ...p, [i]: { ...(p[i]||{}), category: e.target.value } }))}
+                              className="text-[9px] bg-slate-100 text-slate-500 font-black uppercase tracking-[0.2em] rounded-xl px-4 py-2 hover:bg-slate-200 transition-colors outline-none cursor-pointer">
+                              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                            </select>
+                          </td>
+                          <td className="p-8 text-right font-black text-slate-900 italic text-xl tracking-tighter">{formatCurrency(cur.amount)}</td>
                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {parsedData.transactions.map((txn, i) => {
-                          const cur = { ...txn, ...(editing[i] || {}) };
-                          return (
-                            <tr key={i} className={`transition-colors ${selected[i] ? 'bg-white' : 'bg-gray-50 opacity-50'}`}>
-                              <td className="px-3 py-2.5"><input type="checkbox" checked={!!selected[i]} onChange={() => setSelected(p => ({ ...p, [i]: !p[i] }))} className="rounded text-blue-500"/></td>
-                              <td className="px-3 py-2.5 whitespace-nowrap text-gray-500 text-xs">{format(parseISO(cur.date), 'dd MMM yyyy')}</td>
-                              <td className="px-3 py-2.5 max-w-xs">
-                                <input type="text" value={cur.description}
-                                  onChange={e => setEditing(p => ({ ...p, [i]: { ...(p[i]||{}), description: e.target.value } }))}
-                                  className="w-full bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none py-0.5 text-gray-900"/>
-                              </td>
-                              <td className="px-3 py-2.5">
-                                <select value={cur.category}
-                                  onChange={e => setEditing(p => ({ ...p, [i]: { ...(p[i]||{}), category: e.target.value } }))}
-                                  className="text-xs bg-gray-100 border-0 rounded-full px-2 py-1 focus:ring-1 focus:ring-blue-500 cursor-pointer">
-                                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                                </select>
-                              </td>
-                              <td className="px-3 py-2.5 text-right font-bold text-gray-900 whitespace-nowrap">{formatCurrency(cur.amount)}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                  {error && <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-600"><AlertCircle size={16} className="shrink-0 mt-0.5"/>{error}</div>}
-                </>
-              )}
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
           {step === 'success' && (
-            <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-              <CheckCircle2 size={56} className="text-green-500"/>
-              <h3 className="text-xl font-bold text-gray-900">Import Complete!</h3>
-              <p className="text-gray-500 text-sm">Your transactions have been saved.</p>
-              <button onClick={onClose} className="mt-3 bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition font-medium">Done</button>
+            <div className="flex flex-col items-center justify-center py-32 gap-10 text-center">
+              <div className="p-12 bg-emerald-50 text-emerald-500 rounded-[3rem] shadow-2xl animate-bounce-subtle"><CheckCircle2 size={80}/></div>
+              <div className="max-w-md">
+                <h3 className="text-4xl font-black text-slate-950 uppercase tracking-tighter italic mb-4 leading-none">Sync Successful</h3>
+                <p className="text-slate-500 font-black text-sm leading-relaxed uppercase tracking-widest opacity-60">Financial flux has been strategically merged into the local matrix ledger.</p>
+              </div>
+              <button onClick={onClose} className="bg-slate-900 text-white px-16 py-6 rounded-2xl transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-2xl hover:scale-105 active:scale-95">Complete Deployment</button>
             </div>
           )}
         </div>
 
         {step !== 'success' && (
-          <div className="p-5 border-t border-gray-100 flex justify-between bg-gray-50">
+          <div className="p-10 border-t border-slate-50 flex items-center justify-between bg-slate-50/30">
             {step === 'preview' ? (
               <>
-                <button onClick={() => { setStep('upload'); setFile(null); setParsedData(null); }} className="text-sm text-gray-500 hover:text-gray-700 font-medium">← Different file</button>
-                <button onClick={handleImport} disabled={confirmCount === 0 || importMutation.isPending}
-                  className="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition font-medium shadow-sm disabled:opacity-50 text-sm">
-                  {importMutation.isPending ? 'Importing…' : `Import ${confirmCount} transaction${confirmCount !== 1 ? 's' : ''}`}
-                </button>
+                <button onClick={() => { setStep('upload'); setFile(null); setParsedData(null); }} className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-slate-900 transition-all italic underline">← Terminate Audit</button>
+                <div className="flex items-center gap-10 bg-white p-2 rounded-3xl pr-6 border border-slate-100 shadow-sm">
+                   <div className="px-6 border-r border-slate-100">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Entries</p>
+                      <p className="text-lg font-black text-slate-900 italic">{confirmCount}</p>
+                   </div>
+                   <button onClick={handleImport} disabled={confirmCount === 0 || importMutation.isPending}
+                    className="bg-emerald-600 text-white px-12 py-5 rounded-2xl transition-all font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:bg-emerald-700 hover:scale-105 disabled:opacity-30">
+                    {importMutation.isPending ? 'DEPLOYING...' : 'COMMIT DELTA'}
+                   </button>
+                </div>
               </>
             ) : (
               <>
-                <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 font-medium">Cancel</button>
+                <button onClick={onClose} className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-slate-900 transition-all italic underline">Abort Sync</button>
                 <button onClick={() => parseMutation.mutate({ file, accountName })} disabled={!file || parseMutation.isPending}
-                  className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium shadow-sm disabled:opacity-50 text-sm">
-                  {parseMutation.isPending ? 'Parsing…' : 'Parse Statement →'}
+                  className="bg-blue-600 text-white px-16 py-6 rounded-2xl transition-all font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:bg-blue-700 hover:scale-105 active:scale-95 disabled:opacity-30">
+                  {parseMutation.isPending ? 'AUDITING...' : 'EXECUTE ENGINE →'}
                 </button>
               </>
             )}
@@ -326,95 +338,119 @@ const Expenses = () => {
 
   const handleSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['expenses'] });
-    queryClient.invalidateQueries({ queryKey: ['expensesThisMonth'] });
     queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-12 pb-24">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-2">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Expenses Log</h1>
-          <p className="text-gray-500 mt-1">Track and search your transaction history.</p>
+          <div className="flex items-center gap-4 mb-4">
+             <span className="text-rose-600 font-extrabold text-[10px] uppercase tracking-[0.4em] bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100 italic">Outbound Leak Monitoring</span>
+             <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">{expenses?.length || 0} Registered Entities Detected</span>
+          </div>
+          <h1 className="text-6xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Expenses Log</h1>
+          <p className="text-slate-500 mt-6 font-black italic text-sm uppercase tracking-widest opacity-60 ml-1">Real-time Transaction Auditing & Payload Injections.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <button onClick={() => setUploadModalOpen(true)}
-            className="flex items-center gap-2 bg-white text-gray-700 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition shadow-sm font-medium text-sm">
-            <Upload size={16}/> Import Statement
+            className="flex items-center gap-4 px-10 py-6 bg-white text-slate-900 border-2 border-slate-100 rounded-3xl hover:bg-slate-50 transition-all font-black uppercase tracking-[0.3em] text-[10px] shadow-xl hover:scale-105 active:scale-95">
+            <Upload size={22}/> Bulk Audit
           </button>
           <button onClick={() => setFormModal({ open: true, editItem: null })}
-            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 transition shadow-sm font-medium text-sm">
-            <Plus size={16}/> Add Expense
+            className="flex items-center gap-4 px-12 py-6 bg-slate-900 text-white rounded-3xl hover:bg-black transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-2xl hover:scale-105 active:scale-95">
+            <Plus size={24}/> New Entry
           </button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={17}/>
-          <input type="text" placeholder="Search descriptions…" value={searchTerm}
+      {/* Filters Area */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-2">
+        <div className="md:col-span-3 relative group">
+          <div className="absolute left-10 top-1/2 -translate-y-1/2 p-2 bg-slate-50 text-slate-400 rounded-xl group-focus-within:text-blue-600 transition-colors"><Search size={24}/></div>
+          <input type="text" placeholder="Audit Narrative Trail..." value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="pl-9 pr-4 py-2 w-full border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"/>
+            className="pl-24 pr-10 py-8 w-full bg-white border-2 border-slate-100 rounded-[2.5rem] focus:ring-8 focus:ring-blue-500/5 focus:border-blue-500 outline-none text-base font-black text-slate-900 placeholder:opacity-20 uppercase tracking-widest transition-all shadow-sm"/>
         </div>
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 bg-white">
-          <option value="">All Categories</option>
-          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
+        <div className="relative">
+          <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
+            className="appearance-none w-full bg-white border-2 border-slate-100 rounded-[2.5rem] px-10 py-8 text-[11px] font-black uppercase tracking-[0.3em] focus:ring-8 focus:ring-blue-500/5 focus:border-blue-500 outline-none text-slate-900 shadow-sm cursor-pointer transition-all italic">
+            <option value="">All Sectors</option>
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {isLoading ? (
-          <div className="p-8 text-center text-gray-400">Loading…</div>
-        ) : expenses?.length === 0 ? (
-          <div className="p-16 text-center flex flex-col items-center gap-3">
-            <Receipt size={48} className="text-gray-200"/>
-            <p className="font-medium text-gray-700">No expenses found</p>
-            <div className="flex gap-3 mt-2">
-              <button onClick={() => setUploadModalOpen(true)}
-                className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                <Upload size={15}/> Import Statement
-              </button>
-              <button onClick={() => setFormModal({ open: true, editItem: null })}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">
-                <Plus size={15}/> Add Manually
-              </button>
-            </div>
+      {/* Table Area */}
+      {isLoading ? (
+        <div className="space-y-6 animate-pulse px-2">{[1,2,3,4,5].map(i => <div key={i} className="h-24 bg-slate-50 rounded-[2rem]"/>)}</div>
+      ) : expenses?.length === 0 ? (
+        <div className="bg-white rounded-[4rem] border-4 border-dashed border-slate-100 p-32 text-center flex flex-col items-center gap-10 shadow-inner mx-2">
+          <div className="p-10 bg-slate-50 text-slate-200 rounded-[3rem] scale-125">
+            <Receipt size={80} />
           </div>
-        ) : (
-          <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Description</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Account</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Amount</th>
-                <th className="px-6 py-3 w-20"/>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {expenses.map(expense => (
-                <tr key={expense.id} className="hover:bg-gray-50 transition group">
-                  <td className="px-6 py-3.5 text-sm text-gray-400">{format(parseISO(expense.date), 'dd MMM yyyy')}</td>
-                  <td className="px-6 py-3.5 text-sm font-medium text-gray-900">{expense.description}</td>
-                  <td className="px-6 py-3.5"><span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">{expense.category}</span></td>
-                  <td className="px-6 py-3.5 text-sm text-gray-400">{expense.account || '—'}</td>
-                  <td className="px-6 py-3.5 text-sm font-bold text-gray-900 text-right">{formatCurrency(expense.amount)}</td>
-                  <td className="px-6 py-3.5 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                      <button onClick={() => setFormModal({ open: true, editItem: expense })} className="text-gray-400 hover:text-blue-600"><Pencil size={14}/></button>
-                      <button onClick={() => deleteMutation.mutate(expense.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={14}/></button>
-                    </div>
-                  </td>
+          <div className="max-w-md">
+             <h2 className="text-4xl font-black text-slate-950 uppercase italic tracking-tighter leading-none mb-4">Zero Exit Detected</h2>
+             <p className="text-slate-500 font-black text-sm uppercase tracking-widest opacity-60 leading-relaxed italic">No outbound consumption delta found in the core matrix. Financial integrity remains at absolute maximum.</p>
+          </div>
+          <div className="flex gap-6 mt-4">
+            <button onClick={() => setUploadModalOpen(true)}
+              className="px-10 py-5 bg-white border-2 border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-50 transition-all italic">
+              Initialize Bulk Link
+            </button>
+            <button onClick={() => setFormModal({ open: true, editItem: null })}
+              className="bg-rose-600 text-white px-12 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20 italic">
+              Register New Leak Node
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-[3.5rem] shadow-sm border border-slate-100 overflow-hidden mx-2 transition-all hover:shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-slate-50 border-b border-slate-100 italic">
+                <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
+                  <th className="px-12 py-8 text-left">Audit Stamp</th>
+                  <th className="px-12 py-8 text-left">Consumption Narrative</th>
+                  <th className="px-12 py-8 text-left">Sector Node</th>
+                  <th className="px-12 py-8 text-left">Origin path</th>
+                  <th className="px-12 py-8 text-right">Flux Loss</th>
+                  <th className="px-12 py-8 w-32"/>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {expenses.map(expense => (
+                  <tr key={expense.id} className="hover:bg-slate-50 group transition-all cursor-default">
+                    <td className="px-12 py-12 whitespace-nowrap text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic">{format(parseISO(expense.date), 'dd MMM yyyy')}</td>
+                    <td className="px-12 py-12">
+                      <div className="flex items-center gap-6">
+                        <div className="p-4 bg-rose-50 text-rose-600 rounded-[1.5rem] transition-transform group-hover:rotate-12 group-hover:scale-110"><ArrowDownRight size={22}/></div>
+                        <div>
+                           <p className="font-black text-slate-950 text-xl tracking-tighter italic uppercase leading-none">{expense.description}</p>
+                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mt-3">{expense.category.toUpperCase()} NODE</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-12 py-12">
+                       <span className="text-[9px] font-black bg-slate-100 text-slate-500 px-4 py-2 rounded-xl uppercase tracking-[0.2em]">{expense.category}</span>
+                    </td>
+                    <td className="px-12 py-12 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic opacity-60 truncate max-w-[120px]">{expense.account || '—'}</td>
+                    <td className="px-12 py-12 text-right font-black text-rose-600 text-3xl tracking-tighter italic scale-100 group-hover:scale-105 transition-transform">
+                      {formatCurrency(expense.amount)}
+                    </td>
+                    <td className="px-12 py-12 text-right">
+                      <div className="flex items-center justify-end gap-5 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                        <button onClick={() => setFormModal({ open: true, editItem: expense })} className="p-3 bg-white text-slate-400 hover:text-blue-600 rounded-xl shadow-lg hover:scale-110 transition-all"><Pencil size={18}/></button>
+                        <button onClick={() => { if(window.confirm('IRREVERSIBLE: PURGE LOG?')) deleteMutation.mutate(expense.id); }} className="p-3 bg-white text-slate-400 hover:text-rose-600 rounded-xl shadow-lg hover:scale-110 transition-all"><Trash2 size={18}/></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {formModal.open && (
         <ExpenseFormModal

@@ -2,26 +2,19 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 import { formatCurrency } from '../utils/formatters';
-import {
-  Plus, CreditCard, X, Trash2, AlertCircle,
-  DollarSign, ChevronDown, ChevronUp, Pencil, History
-} from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { Plus, Target, Trash2, X, AlertCircle, Landmark, TrendingDown, Target as SniperIcon, Pencil, Crosshair } from 'lucide-react';
 
-const DEBT_TYPES = ['Credit Card', 'Personal Loan', 'Mortgage', 'Vehicle Loan', 'Other'];
-const PAID_OFF_STATUS = 'Paid Off';
+const DEBT_TYPES = ['Credit Card', 'Personal Loan', 'Mortgage', 'Vehicle', 'Other'];
 
-// ─── Reusable Debt Form Modal (Add + Edit) ────────────────────────────────────
+// ─── Add/Edit Debt Modal ──────────────────────────────────────────────────────
 const DebtFormModal = ({ editItem = null, onClose, onSuccess }) => {
   const isEdit = !!editItem;
   const [form, setForm] = useState({
     name: editItem?.name || '',
-    type: editItem?.type || 'Credit Card',
     balance: editItem?.balance ?? '',
-    credit_limit: editItem?.credit_limit ?? '',
     interest_rate: editItem?.interest_rate ?? '',
     min_payment: editItem?.min_payment ?? '',
-    due_date: editItem?.due_date ?? '',
+    type: editItem?.type || 'Credit Card',
   });
   const [error, setError] = useState('');
 
@@ -31,81 +24,71 @@ const DebtFormModal = ({ editItem = null, onClose, onSuccess }) => {
       return (await api.post('/debts/', data)).data;
     },
     onSuccess: () => { onSuccess(); onClose(); },
-    onError: (e) => setError(e.response?.data?.detail || 'Failed to save.'),
+    onError: (e) => setError(e.response?.data?.detail || 'Failed to sync.'),
   });
-
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleSubmit = (e) => {
     e.preventDefault(); setError('');
-    mutation.mutate({
-      name: form.name, type: form.type,
+    const payload = {
+      ...form,
       balance: parseFloat(form.balance),
-      credit_limit: form.credit_limit !== '' ? parseFloat(form.credit_limit) : null,
       interest_rate: parseFloat(form.interest_rate),
       min_payment: parseFloat(form.min_payment),
-      due_date: form.due_date !== '' ? parseInt(form.due_date) : null,
-    });
+    };
+    mutation.mutate(payload);
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">{isEdit ? 'Edit Account' : 'Add Credit / Loan Account'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100"><X size={20}/></button>
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white/20">
+        <div className="flex items-center justify-between p-12 border-b border-slate-50 bg-slate-50/50">
+          <h2 className="text-2xl font-black text-rose-600 uppercase tracking-tighter italic">{isEdit ? 'Target Refinement' : 'New Sniper Target'}</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-100 transition-all"><X size={24}/></button>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-sm"><AlertCircle size={16}/>{error}</div>}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Account / Card Name *</label>
-              <input required value={form.name} onChange={e => set('name', e.target.value)}
-                placeholder="e.g. BOC Credit Card"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+        <form onSubmit={handleSubmit} className="p-12 space-y-8">
+          {error && <div className="flex items-center gap-3 bg-rose-50 text-rose-600 p-5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-rose-100"><AlertCircle size={18}/>{error}</div>}
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Debt Identity (Descriptor)</label>
+              <input required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                placeholder="e.g. BOC Primary Matrix"
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all uppercase tracking-widest"/>
             </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Account Type *</label>
-              <select required value={form.type} onChange={e => set('type', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+
+            <div className="grid grid-cols-2 gap-6">
+               <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Total Balance (Rs)</label>
+                <input required type="number" step="0.01" value={form.balance} onChange={e => setForm(p => ({ ...p, balance: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all italic"/>
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">APR Rate (%)</label>
+                <input required type="number" step="0.1" value={form.interest_rate} onChange={e => setForm(p => ({ ...p, interest_rate: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all italic"/>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Minimum Flux Target (Monthly Rs)</label>
+              <input required type="number" step="0.01" value={form.min_payment} onChange={e => setForm(p => ({ ...p, min_payment: e.target.value }))}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all italic"/>
+            </div>
+
+            <div>
+              <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Liability Sector</label>
+              <select required value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all">
                 {DEBT_TYPES.map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Current Balance (Rs) *</label>
-              <input required type="number" min="0" step="0.01" value={form.balance} onChange={e => set('balance', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Credit Limit (Rs)</label>
-              <input type="number" min="0" step="0.01" value={form.credit_limit} onChange={e => set('credit_limit', e.target.value)}
-                placeholder="Cards only"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate (% / yr) *</label>
-              <input required type="number" min="0" step="0.01" value={form.interest_rate} onChange={e => set('interest_rate', e.target.value)}
-                placeholder="e.g. 24"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min. Payment (Rs) *</label>
-              <input required type="number" min="0" step="0.01" value={form.min_payment} onChange={e => set('min_payment', e.target.value)}
-                placeholder="e.g. 5000"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Due Date (day of month)</label>
-              <input type="number" min="1" max="31" value={form.due_date} onChange={e => set('due_date', e.target.value)}
-                placeholder="e.g. 15"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-            </div>
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
+            <button type="button" onClick={onClose} className="px-8 py-5 text-slate-400 hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-all">Abort Lock</button>
             <button type="submit" disabled={mutation.isPending}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium disabled:opacity-50">
-              {mutation.isPending ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Account'}
+              className="px-10 py-5 bg-rose-600 text-white rounded-2xl hover:bg-rose-700 transition-all font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-50">
+              {mutation.isPending ? 'DEPLOYING...' : 'FORCE LOCK TARGET'}
             </button>
           </div>
         </form>
@@ -114,168 +97,10 @@ const DebtFormModal = ({ editItem = null, onClose, onSuccess }) => {
   );
 };
 
-// ─── Make Payment Modal ───────────────────────────────────────────────────────
-const MakePaymentModal = ({ debt, onClose, onSuccess }) => {
-  const today = new Date().toISOString().split('T')[0];
-  const [amount, setAmount] = useState(String(debt.min_payment));
-  const [paymentDate, setPaymentDate] = useState(today);
-  const [notes, setNotes] = useState('');
-  const [error, setError] = useState('');
-
-  const mutation = useMutation({
-    mutationFn: async (data) => (await api.post(`/debts/${debt.id}/payment`, data)).data,
-    onSuccess: () => { onSuccess(); onClose(); },
-    onError: (e) => setError(e.response?.data?.detail || 'Failed to record payment.'),
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault(); setError('');
-    mutation.mutate({ amount: parseFloat(amount), payment_date: paymentDate, notes: notes || null });
-  };
-
-  return (
-    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Make Payment</h2>
-            <p className="text-sm text-gray-500 mt-0.5">{debt.name}</p>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100"><X size={20}/></button>
-        </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-sm"><AlertCircle size={16}/>{error}</div>}
-          <div className="bg-blue-50 rounded-xl p-4 flex justify-between items-center">
-            <span className="text-sm text-gray-600">Current Balance</span>
-            <span className="font-extrabold text-gray-900 text-lg">{formatCurrency(debt.balance)}</span>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Amount (Rs) *</label>
-            <input required type="number" min="0.01" step="0.01" value={amount}
-              onChange={e => setAmount(e.target.value)} autoFocus
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-            <p className="text-xs text-gray-400 mt-1">Min payment: {formatCurrency(debt.min_payment)}</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Date *</label>
-            <input required type="date" value={paymentDate} onChange={e => setPaymentDate(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
-            <input type="text" value={notes} onChange={e => setNotes(e.target.value)}
-              placeholder="e.g. Full payment, Partial, Statement payment"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
-            <button type="submit" disabled={mutation.isPending}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium disabled:opacity-50">
-              {mutation.isPending ? 'Recording…' : 'Record Payment'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-// ─── Debt Card ────────────────────────────────────────────────────────────────
-const DebtCard = ({ debt, onEdit, onDelete, onPay }) => {
-  const [showHistory, setShowHistory] = useState(false);
-  const utilisation = debt.credit_limit ? (debt.balance / debt.credit_limit) * 100 : 0;
-  let barColor = 'bg-green-500';
-  if (utilisation > 40) barColor = 'bg-amber-500';
-  if (utilisation > 75) barColor = 'bg-red-500';
-
-  const payments = debt.payments ?? [];
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg"><CreditCard size={22}/></div>
-            <div>
-              <h3 className="font-bold text-gray-900">{debt.name}</h3>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">{debt.type}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <div className="text-right">
-              <p className="text-xl font-bold text-gray-900">{formatCurrency(debt.balance)}</p>
-              <p className="text-xs text-gray-400">{debt.interest_rate}% APR</p>
-            </div>
-            <div className="flex flex-col gap-1 ml-1">
-              <button onClick={onEdit} className="text-gray-400 hover:text-blue-600 transition p-0.5"><Pencil size={14}/></button>
-              <button onClick={onDelete} className="text-gray-400 hover:text-red-500 transition p-0.5"><Trash2 size={14}/></button>
-            </div>
-          </div>
-        </div>
-
-        {debt.credit_limit > 0 && (
-          <div className="mb-4">
-            <div className="flex justify-between text-xs mb-1 text-gray-500">
-              <span>Credit Utilisation</span>
-              <span className="font-bold text-gray-700">{utilisation.toFixed(1)}%</span>
-            </div>
-            <div className="w-full bg-gray-100 rounded-full h-2">
-              <div className={`${barColor} h-2 rounded-full transition-all duration-700`} style={{ width: `${Math.min(utilisation, 100)}%` }}/>
-            </div>
-            <div className="flex justify-between mt-1 text-xs text-gray-400">
-              <span>Min: {formatCurrency(debt.min_payment)}</span>
-              {debt.due_date && <span>Due: {debt.due_date}th</span>}
-              <span>Limit: {formatCurrency(debt.credit_limit)}</span>
-            </div>
-          </div>
-        )}
-
-        <div className="flex gap-2">
-          <button onClick={onPay}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium text-blue-600 border border-blue-500 rounded-lg hover:bg-blue-50 transition">
-            <DollarSign size={14}/> Make Payment
-          </button>
-          {payments.length > 0 && (
-            <button onClick={() => setShowHistory(h => !h)}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-              <History size={14}/>
-              {showHistory ? <ChevronUp size={13}/> : <ChevronDown size={13}/>}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Payment History Panel */}
-      {showHistory && payments.length > 0 && (
-        <div className="border-t border-gray-100 px-6 pb-4 pt-3">
-          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
-            <History size={12}/> Payment History
-          </h4>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {[...payments].sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date)).map(p => (
-              <div key={p.id} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
-                <div>
-                  <p className="text-xs font-semibold text-gray-700">
-                    {format(parseISO(p.payment_date), 'dd MMM yyyy')}
-                  </p>
-                  {p.notes && <p className="text-xs text-gray-400">{p.notes}</p>}
-                </div>
-                <span className="text-sm font-bold text-green-600">- {formatCurrency(p.amount)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── Debt Page ────────────────────────────────────────────────────────────────
+// ─── Main Debt Page ───────────────────────────────────────────────────────────
 const Debt = () => {
   const queryClient = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
-  const [editDebt, setEditDebt] = useState(null);
-  const [paymentDebt, setPaymentDebt] = useState(null);
+  const [formModal, setFormModal] = useState({ open: false, editItem: null });
 
   const { data: debts, isLoading } = useQuery({
     queryKey: ['debts'],
@@ -290,73 +115,140 @@ const Debt = () => {
     },
   });
 
-  const invalidate = () => {
+  const handleSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['debts'] });
     queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
   };
 
-  const activeDebts = debts?.filter(d => d.status !== PAID_OFF_STATUS) ?? [];
-  const totalDebt = activeDebts.reduce((s, d) => s + d.balance, 0);
+  const totalOutstanding = debts?.reduce((s, debt) => s + (debt.status !== 'Paid Off' ? debt.balance : 0), 0) || 0;
+  const activeTargets = debts?.filter(d => d.status !== 'Paid Off') || [];
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-12 pb-24">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-2">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Credit & Debt</h1>
-          <p className="text-gray-500 mt-1">Manage your credit cards and loans.</p>
+          <div className="flex items-center gap-4 mb-4">
+             <span className="text-rose-600 font-extrabold text-[10px] uppercase tracking-[0.4em] bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100 italic">Target Acquisition: Online</span>
+             <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Perimeter Accounts: {activeTargets.length} Traceable</span>
+          </div>
+          <h1 className="text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-rose-900 uppercase italic leading-none">Debt Sniper Console</h1>
+          <p className="text-slate-500 mt-6 font-black italic text-sm uppercase tracking-widest opacity-60 ml-1">High-Precision Identification & Systematic Balance Elimination.</p>
         </div>
-        <button onClick={() => { setEditDebt(null); setShowForm(true); }}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm font-medium">
-          <Plus size={18}/> Add Account
+        <button onClick={() => setFormModal({ open: true, editItem: null })}
+          className="flex items-center gap-4 px-12 py-6 bg-rose-600 text-white rounded-3xl hover:bg-rose-700 transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-2xl hover:scale-105 active:scale-95 shadow-rose-600/20">
+          <Plus size={24}/> Add New Target
         </button>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[1,2].map(i => <div key={i} className="h-48 bg-gray-100 rounded-xl animate-pulse"/>)}
-        </div>
-      ) : activeDebts.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-16 text-center flex flex-col items-center gap-3">
-          <CreditCard size={40} className="text-gray-300"/>
-          <p className="font-medium text-gray-700">No accounts added yet</p>
-          <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition mt-1">
-            Add your first account
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Total Outstanding Debt</p>
-            <p className="text-3xl font-extrabold text-red-600">{formatCurrency(totalDebt)}</p>
-            <p className="text-xs text-gray-400 mt-1">{activeDebts.length} active account{activeDebts.length !== 1 ? 's' : ''}</p>
-          </div>
+      {/* Aggregate Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-2">
+         <div className="bg-slate-950 rounded-[3rem] p-10 shadow-2xl flex flex-col justify-center border border-white/5 relative overflow-hidden group hover:scale-[1.02] transition-all">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-600/10 rounded-full blur-[100px] pointer-events-none group-hover:scale-150 transition-all duration-[3000ms]"></div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-4 opacity-80 relative z-10 italic">Combined Exposure Delta</p>
+            <p className="text-5xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(totalOutstanding)}</p>
+            <div className="absolute bottom-10 right-10 opacity-20 relative z-10 transition-transform group-hover:rotate-45">
+               <SniperIcon size={80} className="text-rose-500" />
+            </div>
+         </div>
+         <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-center hover:shadow-xl transition-all group">
+            <div className="flex justify-between items-start mb-4">
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] opacity-60">Primary Target Trace</p>
+               <Crosshair className="text-rose-600 group-hover:animate-spin" size={24} />
+            </div>
+            <p className="text-2xl font-black text-slate-950 tracking-tight italic uppercase">{activeTargets[0]?.name || 'Zero Targets'}</p>
+            <div className="mt-4 flex items-center gap-3">
+               <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">APR: {activeTargets[0]?.interest_rate || 0}% Matrix</span>
+            </div>
+         </div>
+         <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-center hover:shadow-xl transition-all group">
+            <div className="flex justify-between items-start mb-4">
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] opacity-60">Monthly Min Protocol</p>
+               <Landmark className="text-slate-400" size={24} />
+            </div>
+            <p className="text-2xl font-black text-slate-950 tracking-tight italic uppercase">{formatCurrency(activeTargets.reduce((s,d)=>s+d.min_payment, 0))}</p>
+            <div className="mt-4 flex items-center gap-3">
+               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic opacity-60">Aggregate Minimum Outbound Flux</p>
+            </div>
+         </div>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {activeDebts.map(debt => (
-              <DebtCard
-                key={debt.id}
-                debt={debt}
-                onEdit={() => { setEditDebt(debt); setShowForm(true); }}
-                onDelete={() => deleteMutation.mutate(debt.id)}
-                onPay={() => setPaymentDebt(debt)}
-              />
-            ))}
-          </div>
-        </>
-      )}
+      {/* Targets Table */}
+      <div className="bg-white rounded-[3.5rem] shadow-sm border border-slate-100 overflow-hidden mx-2 transition-all hover:shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-slate-50 border-b border-slate-100 italic">
+              <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
+                <th className="px-12 py-8 text-left">Target ID</th>
+                <th className="px-12 py-8 text-left">Classification</th>
+                <th className="px-12 py-8 text-right">APR Trace</th>
+                <th className="px-12 py-8 text-right">Min Probe</th>
+                <th className="px-12 py-8 text-right">Exit Value</th>
+                <th className="px-12 py-8 w-32"/>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {isLoading ? (
+                [1,2,3].map(i => <tr key={i} className="animate-pulse"><td colSpan="6" className="px-12 py-10"><div className="h-12 bg-slate-50 rounded-2xl w-full"></div></td></tr>)
+              ) : activeTargets.length === 0 ? (
+                <tr>
+                   <td colSpan="6" className="px-12 py-32 text-center">
+                    <div className="flex flex-col items-center gap-8 opacity-20">
+                       <Crosshair size={96} className="text-slate-500" />
+                       <p className="font-black uppercase tracking-[0.5em] text-[12px]">Perimeter Status: Pure. Zero Liabilities Identified.</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                activeTargets.sort((a,b) => b.interest_rate - a.interest_rate).map(debt => (
+                  <tr key={debt.id} className="hover:bg-slate-50 group transition-all cursor-crosshair">
+                    <td className="px-12 py-12">
+                      <div className="flex items-center gap-8">
+                         <div className="relative">
+                            <div className="absolute -inset-2 bg-rose-500/10 rounded-full blur-[10px] opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+                            <div className="p-4 bg-white text-rose-600 rounded-full shadow-lg border border-rose-50 transform group-hover:scale-125 transition-all">
+                               <SniperIcon size={24}/>
+                            </div>
+                         </div>
+                         <div>
+                            <p className="font-black text-slate-950 text-2xl tracking-tighter uppercase italic leading-none">{debt.name}</p>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3 opacity-60 italic">Node Lockdown Established</p>
+                         </div>
+                      </div>
+                    </td>
+                    <td className="px-12 py-12">
+                       <span className="text-[10px] font-black bg-rose-50 text-rose-600 px-4 py-2 rounded-xl border border-rose-100 uppercase tracking-[0.2em]">{debt.type}</span>
+                    </td>
+                    <td className="px-12 py-12 text-right">
+                       <p className="font-black text-rose-600 text-2xl tracking-tight leading-none italic">{debt.interest_rate}% <span className="text-[10px] uppercase opacity-50 ml-1 tracking-widest">APR</span></p>
+                       <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">{formatCurrency((debt.balance * debt.interest_rate / 100 / 12))} leak/mo</p>
+                    </td>
+                    <td className="px-12 py-12 text-right font-black text-slate-400 text-xl tracking-tighter">{formatCurrency(debt.min_payment)}</td>
+                    <td className="px-12 py-12 text-right font-black text-slate-900 text-4xl tracking-tighter italic transform group-hover:scale-105 transition-all origin-right">
+                      {formatCurrency(debt.balance)}
+                    </td>
+                    <td className="px-12 py-12 text-right">
+                       <div className="flex items-center justify-end gap-5 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                        <button onClick={() => setFormModal({ open: true, editItem: debt })} className="p-4 bg-white text-slate-400 hover:text-blue-600 rounded-2xl shadow-xl hover:scale-110 transition-all"><Pencil size={20}/></button>
+                        <button onClick={() => {if(window.confirm('IRREVERSIBLE: TERMINATE TRACE?')) deleteMutation.mutate(debt.id); }} className="p-4 bg-white text-slate-400 hover:text-rose-600 rounded-2xl shadow-xl hover:scale-110 transition-all"><Trash2 size={20}/></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      {showForm && (
+      <div className="text-center mt-8">
+         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] italic">Strategic Asset Neutralization Active Section 2.1</p>
+      </div>
+
+      {formModal.open && (
         <DebtFormModal
-          editItem={editDebt}
-          onClose={() => { setShowForm(false); setEditDebt(null); }}
-          onSuccess={invalidate}
-        />
-      )}
-      {paymentDebt && (
-        <MakePaymentModal
-          debt={paymentDebt}
-          onClose={() => setPaymentDebt(null)}
-          onSuccess={invalidate}
+          editItem={formModal.editItem}
+          onClose={() => setFormModal({ open: false, editItem: null })}
+          onSuccess={handleSuccess}
         />
       )}
     </div>

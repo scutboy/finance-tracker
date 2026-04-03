@@ -2,17 +2,12 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 import { formatCurrency } from '../utils/formatters';
-import { Plus, TrendingUp, Trash2, X, AlertCircle, ArrowUpCircle, Pencil } from 'lucide-react';
+import { Plus, Trash2, X, AlertCircle, ArrowUpRight, TrendingUp, Landmark, Calendar, Search } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
-const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Business', 'Investment', 'Rental', 'Bonus', 'Other'];
-const CATEGORY_COLORS = {
-  Salary: 'bg-blue-50 text-blue-600', Freelance: 'bg-indigo-50 text-indigo-600',
-  Business: 'bg-purple-50 text-purple-600', Investment: 'bg-yellow-50 text-yellow-700',
-  Rental: 'bg-orange-50 text-orange-600', Bonus: 'bg-green-50 text-green-600', Other: 'bg-gray-100 text-gray-600',
-};
+const CATEGORIES = ['Salary', 'Bonus', 'Freelance', 'Investment', 'Other'];
 
-// ─── Income Form Modal (Add + Edit) ──────────────────────────────────────────
+// ─── Add/Edit Income Modal ────────────────────────────────────────────────────
 const IncomeFormModal = ({ editItem = null, onClose, onSuccess }) => {
   const isEdit = !!editItem;
   const today = new Date().toISOString().split('T')[0];
@@ -33,58 +28,56 @@ const IncomeFormModal = ({ editItem = null, onClose, onSuccess }) => {
     onError: (e) => setError(e.response?.data?.detail || 'Failed to save.'),
   });
 
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-
   const handleSubmit = (e) => {
     e.preventDefault(); setError('');
     mutation.mutate({ ...form, amount: parseFloat(form.amount) });
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">{isEdit ? 'Edit Income Entry' : 'Add Income'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100"><X size={20}/></button>
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-white/20">
+        <div className="flex items-center justify-between p-12 border-b border-slate-50 bg-slate-50/50">
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">{isEdit ? 'Refine Influx' : 'Register New Flux'}</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-900 p-2 rounded-xl hover:bg-slate-100 transition-all"><X size={24}/></button>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-sm"><AlertCircle size={16}/>{error}</div>}
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="p-12 space-y-8">
+          {error && <div className="flex items-center gap-3 bg-rose-50 text-rose-600 p-5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-rose-100"><AlertCircle size={18}/>{error}</div>}
+          
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Entry Timestamp</label>
+                <input required type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all"/>
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Amount (Rs)</label>
+                <input required type="number" min="1" step="0.01" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all italic"/>
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
-              <input required type="date" value={form.date} onChange={e => set('date', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"/>
+              <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Description Narrative</label>
+              <input required value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                placeholder="e.g. Monthly Professional Influx"
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all"/>
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Amount (Rs) *</label>
-              <input required type="number" min="0.01" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"/>
+              <label className="block text-[10px] uppercase font-black text-slate-400 mb-3 tracking-widest px-1">Sector Classification</label>
+              <select required value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 text-sm font-black text-slate-900 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all">
+                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+              </select>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-            <input required value={form.description} onChange={e => set('description', e.target.value)}
-              placeholder="e.g. Monthly Salary, Freelance Project"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"/>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-            <div className="grid grid-cols-3 gap-2">
-              {INCOME_CATEGORIES.map(cat => (
-                <button key={cat} type="button" onClick={() => set('category', cat)}
-                  className={`py-2 px-3 rounded-lg text-sm font-medium border transition text-center ${
-                    form.category === cat ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">Cancel</button>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
+            <button type="button" onClick={onClose} className="px-8 py-5 text-slate-400 hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-all">Abort Sync</button>
             <button type="submit" disabled={mutation.isPending}
-              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium disabled:opacity-50">
-              {mutation.isPending ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Income'}
+              className="px-10 py-5 bg-slate-900 text-white rounded-2xl hover:bg-black transition-all font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-50">
+              {mutation.isPending ? 'Writing Flux...' : 'Lock Deposit Node'}
             </button>
           </div>
         </form>
@@ -93,12 +86,12 @@ const IncomeFormModal = ({ editItem = null, onClose, onSuccess }) => {
   );
 };
 
-// ─── Income Page ──────────────────────────────────────────────────────────────
+// ─── Main Income Page ─────────────────────────────────────────────────────────
 const Income = () => {
   const queryClient = useQueryClient();
   const [formModal, setFormModal] = useState({ open: false, editItem: null });
 
-  const { data: incomeList, isLoading } = useQuery({
+  const { data: incomes, isLoading } = useQuery({
     queryKey: ['income'],
     queryFn: async () => (await api.get('/income/')).data,
   });
@@ -116,95 +109,112 @@ const Income = () => {
     queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
   };
 
-  const totalIncome = incomeList?.reduce((s, i) => s + i.amount, 0) ?? 0;
-
-  const byMonth = {};
-  incomeList?.forEach(entry => {
-    const key = format(parseISO(entry.date), 'MMMM yyyy');
-    if (!byMonth[key]) byMonth[key] = [];
-    byMonth[key].push(entry);
-  });
+  const totalInbound = incomes?.reduce((s, i) => s + i.amount, 0) || 0;
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-12 pb-24">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-2">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Income</h1>
-          <p className="text-gray-500 mt-1">Track all your income sources.</p>
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-emerald-600 font-extrabold text-[10px] uppercase tracking-[0.4em] bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 italic">Financial Influx Verified</span>
+            <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Cycle Record Count: {incomes?.length || 0}</span>
+          </div>
+          <h1 className="text-6xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Inbound Flux Console</h1>
+          <p className="text-slate-500 mt-6 font-black italic text-sm uppercase tracking-widest opacity-60 ml-1">Real-time monitoring of all strategic liquidity deposits.</p>
         </div>
         <button onClick={() => setFormModal({ open: true, editItem: null })}
-          className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2.5 rounded-lg hover:bg-emerald-700 transition shadow-sm font-medium">
-          <Plus size={18}/> Add Income
+          className="flex items-center gap-4 px-10 py-6 bg-slate-900 text-white rounded-3xl hover:bg-black transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-2xl hover:scale-105 active:scale-95">
+          <Plus size={24}/> New Deposit
         </button>
       </div>
 
-      {incomeList?.length > 0 && (
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-500 rounded-2xl p-6 text-white shadow-lg">
-          <p className="text-emerald-100 text-sm font-medium uppercase tracking-wide">All-Time Income</p>
-          <p className="text-4xl font-extrabold mt-1">{formatCurrency(totalIncome)}</p>
-          <p className="text-emerald-200 text-sm mt-1">{incomeList.length} entries recorded</p>
-        </div>
-      )}
+      {/* Aggregate Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-2">
+         <div className="bg-slate-950 rounded-[3rem] p-10 shadow-2xl flex flex-col justify-center border border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none group-hover:scale-150 transition-all duration-[3000ms]"></div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-4 opacity-80 relative z-10">Total Aggregate Influx</p>
+            <p className="text-5xl font-black text-emerald-500 tracking-tighter italic relative z-10">{formatCurrency(totalInbound)}</p>
+            <div className="absolute bottom-10 right-10 opacity-10 relative z-10">
+               <TrendingUp size={64} className="text-emerald-500" />
+            </div>
+         </div>
+         <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-center hover:shadow-xl transition-all">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 opacity-60">Latest Deposit Narrative</p>
+            <p className="text-2xl font-black text-slate-900 tracking-tight italic uppercase">{incomes?.[0]?.description || 'Zero Logs'}</p>
+            <div className="mt-4 flex items-center gap-3">
+               <Calendar size={14} className="text-slate-400" />
+               <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{incomes?.[0] ? format(parseISO(incomes[0].date), 'dd MMM yyyy') : 'No Data'}</span>
+            </div>
+         </div>
+         <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-center hover:shadow-xl transition-all">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 opacity-60">Primary Sector Focus</p>
+            <p className="text-2xl font-black text-slate-900 tracking-tight italic uppercase">Professional Flow</p>
+            <div className="mt-4 flex items-center gap-3">
+               <Landmark size={14} className="text-slate-400" />
+               <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Verified Liquid Assets</span>
+            </div>
+         </div>
+      </div>
 
-      {isLoading ? (
-        <div className="space-y-4 animate-pulse">{[1,2,3].map(i => <div key={i} className="h-16 bg-gray-100 rounded-xl"/>)}</div>
-      ) : incomeList?.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-16 text-center flex flex-col items-center gap-3">
-          <TrendingUp size={40} className="text-gray-300"/>
-          <p className="font-medium text-gray-700">No income records yet</p>
-          <button onClick={() => setFormModal({ open: true, editItem: null })}
-            className="mt-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition">
-            Add First Income Entry
-          </button>
+      {/* Table Section */}
+      <div className="bg-white rounded-[3.5rem] shadow-sm border border-slate-100 overflow-hidden mx-2 transition-all hover:shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-slate-50 border-b border-slate-100">
+              <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic">
+                <th className="px-12 py-8 text-left">Sync Timestamp</th>
+                <th className="px-12 py-8 text-left">Influx Narrative</th>
+                <th className="px-12 py-8 text-left">Sector Cluster</th>
+                <th className="px-12 py-8 text-right">Flux Valuation</th>
+                <th className="px-12 py-8 w-32"/>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {isLoading ? (
+                [1,2,3,4,5].map(i => <tr key={i} className="animate-pulse"><td colSpan="5" className="px-12 py-8"><div className="h-10 bg-slate-50 rounded-2xl w-full"></div></td></tr>)
+              ) : incomes?.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-12 py-32 text-center">
+                    <div className="flex flex-col items-center gap-6 opacity-30">
+                       <Landmark size={80} className="text-slate-200" />
+                       <p className="font-black uppercase tracking-[0.4em] text-[10px]">No Strategic Influx Records Detected</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                incomes.map(income => (
+                  <tr key={income.id} className="hover:bg-slate-50 group transition-all">
+                    <td className="px-12 py-10 whitespace-nowrap text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{format(parseISO(income.date), 'dd MMM yyyy')}</td>
+                    <td className="px-12 py-10">
+                      <div className="flex items-center gap-6">
+                        <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl transition-transform group-hover:rotate-12"><ArrowUpRight size={20}/></div>
+                        <div>
+                           <p className="font-black text-slate-900 text-lg tracking-tight uppercase italic leading-none">{income.description}</p>
+                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2">{income.category} Deposit Node</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-12 py-10">
+                      <span className="text-[9px] font-black bg-white border border-slate-200 text-slate-500 px-4 py-2 rounded-xl uppercase tracking-[0.2em] shadow-sm">
+                        {income.category}
+                      </span>
+                    </td>
+                    <td className="px-12 py-10 text-right font-black text-emerald-600 text-3xl italic tracking-tighter">
+                      {formatCurrency(income.amount)}
+                    </td>
+                    <td className="px-12 py-10 text-right">
+                      <div className="flex items-center justify-end gap-5 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                        <button onClick={() => setFormModal({ open: true, editItem: income })} className="p-3 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl shadow-lg hover:scale-110 transition-all"><Plus size={18} className="rotate-45"/></button>
+                        <button onClick={() => {if(window.confirm('IRREVERSIBLE: DELETE RECORD?')) deleteMutation.mutate(income.id); }} className="p-3 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl shadow-lg hover:scale-110 transition-all"><Trash2 size={18}/></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      ) : (
-        <div className="space-y-8">
-          {Object.entries(byMonth).map(([month, entries]) => {
-            const monthTotal = entries.reduce((s, e) => s + e.amount, 0);
-            return (
-              <div key={month}>
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider">{month}</h2>
-                  <span className="text-sm font-bold text-emerald-600">{formatCurrency(monthTotal)}</span>
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-100">
-                    <tbody className="divide-y divide-gray-50">
-                      {entries.map(entry => (
-                        <tr key={entry.id} className="hover:bg-gray-50 transition group">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><ArrowUpCircle size={18}/></div>
-                              <div>
-                                <p className="font-semibold text-gray-900 text-sm">{entry.description}</p>
-                                <p className="text-xs text-gray-400">{format(parseISO(entry.date), 'dd MMM yyyy')}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[entry.category] || 'bg-gray-100 text-gray-600'}`}>
-                              {entry.category}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-bold text-emerald-600 text-base">
-                            + {formatCurrency(entry.amount)}
-                          </td>
-                          <td className="px-6 py-4 text-right w-20">
-                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                              <button onClick={() => setFormModal({ open: true, editItem: entry })} className="text-gray-400 hover:text-blue-600"><Pencil size={14}/></button>
-                              <button onClick={() => deleteMutation.mutate(entry.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={14}/></button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      </div>
 
       {formModal.open && (
         <IncomeFormModal

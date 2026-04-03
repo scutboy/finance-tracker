@@ -4,23 +4,34 @@ import api from '../services/api';
 import { formatCurrency } from '../utils/formatters';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, Legend
+  ResponsiveContainer, Legend, CartesianGrid
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { Wallet, Landmark, TrendingDown, PiggyBank, TrendingUp, ArrowUpRight, ArrowDownRight, Target, ShieldCheck, HeartPulse, Zap, X } from 'lucide-react';
 import Confetti from 'react-confetti';
+import { format, parseISO } from 'date-fns';
 
 const COLORS = ['#A32D2D', '#854F0B', '#185FA5', '#3B6D11', '#4A5568'];
 
-const MetricCard = ({ title, amount, icon, isNegative = false, subtitle = null }) => (
-  <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-white/5 flex items-center gap-4 hover:shadow-md transition-shadow group">
-    <div className={`p-3.5 rounded-xl transition-colors ${isNegative ? 'bg-red-50 dark:bg-red-500/10 text-red-600' : 'bg-green-50 dark:bg-green-500/10 text-green-600'}`}>
+const MetricCard = ({ title, amount, icon, isNegative = false, subtitle = null, isNetFlow = false }) => (
+  <div className={`p-6 rounded-3xl shadow-sm border flex items-center gap-5 transition-all hover:shadow-lg bg-white group ${
+    isNetFlow 
+      ? (parseFloat(amount.replace(/[^0-9.-]+/g,"")) >= 0 ? 'bg-emerald-50/30 border-emerald-100/50' : 'bg-rose-50/30 border-rose-100/50')
+      : 'border-slate-200/50'
+  }`}>
+    <div className={`p-4 rounded-2xl transition-all group-hover:scale-110 ${
+      isNegative 
+        ? 'bg-rose-50 text-rose-600' 
+        : 'bg-emerald-50 text-emerald-600'
+    }`}>
       {icon}
     </div>
     <div className="min-w-0">
-      <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{title}</p>
-      <h3 className={`text-xl font-extrabold truncate dark:text-white ${isNegative ? 'text-red-600' : 'text-gray-900'}`}>{amount}</h3>
-      {subtitle && <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{subtitle}</p>}
+      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{title}</p>
+      <h3 className={`text-2xl font-bold truncate text-slate-900 tracking-tight ${
+        isNegative ? 'text-rose-600' : (isNetFlow ? (parseFloat(amount.replace(/[^0-9.-]+/g,"")) >= 0 ? 'text-emerald-600' : 'text-rose-600') : 'text-slate-900')
+      }`}>{amount}</h3>
+      {subtitle && <p className="text-[9px] text-slate-400 mt-1 font-medium uppercase tracking-wider opacity-60 italic">{subtitle}</p>}
     </div>
   </div>
 );
@@ -30,43 +41,43 @@ const SweeperModal = ({ surplus, onClose, targetDebt, emergencyGoal }) => {
   const savingsAlloc = Math.round(surplus * 0.6);
 
   return (
-    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-950 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-white/10">
-        <div className="bg-gradient-to-br from-green-600 to-emerald-700 p-8 text-white text-center relative">
-          <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white transition"><X size={20}/></button>
-          <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
-            <Zap size={32} />
+    <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200/50">
+        <div className="bg-vantage-950 p-10 text-white text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <button onClick={onClose} className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"><X size={24}/></button>
+          <div className="bg-white/10 w-20 h-20 rounded-2xl rotate-6 flex items-center justify-center mx-auto mb-6 backdrop-blur-md border border-white/10">
+            <Zap size={32} className="text-yellow-400" />
           </div>
-          <h2 className="text-2xl font-black italic">SURPLUS DETECTED!</h2>
-          <p className="text-green-100 font-medium">You have {formatCurrency(surplus)} leftover this cycle.</p>
+          <h2 className="text-3xl font-bold tracking-tight uppercase mb-2">Realignment Protocol</h2>
+          <p className="text-blue-200/60 font-medium uppercase tracking-widest text-[9px]">Unallocated flux: {formatCurrency(surplus)}</p>
         </div>
-        <div className="p-8 space-y-6">
-          <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed text-center">
-            Don't let it sit! Your smart swept plan allocates this to achieve your goals faster:
+        <div className="p-10 space-y-8">
+          <p className="text-slate-400 text-[10px] text-center font-bold uppercase tracking-widest">
+            Optimal Allocation Strategy:
           </p>
           <div className="space-y-4">
-            <div className="flex items-center gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5">
-              <div className="bg-red-100 dark:bg-red-500/20 text-red-600 p-2 rounded-lg"><Target size={18}/></div>
+            <div className="flex items-center gap-5 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+              <div className="bg-rose-50 text-rose-500 p-3 rounded-xl"><Target size={20}/></div>
               <div className="flex-1">
-                <p className="text-[10px] uppercase font-bold text-gray-400">Debt Sniper (40%)</p>
-                <p className="text-sm font-bold text-gray-800 dark:text-slate-200">Pay off {targetDebt?.name || 'highest balance'}</p>
+                <p className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mb-1">Debt Sniper (40%)</p>
+                <p className="text-sm font-bold text-slate-900">{targetDebt?.name || 'Primary Liability'}</p>
               </div>
-              <p className="font-black text-red-600">{formatCurrency(debtAlloc)}</p>
+              <p className="font-bold text-rose-600 text-xl">{formatCurrency(debtAlloc)}</p>
             </div>
-            <div className="flex items-center gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5">
-              <div className="bg-blue-100 dark:bg-blue-500/20 text-blue-600 p-2 rounded-lg"><ShieldCheck size={18}/></div>
+            <div className="flex items-center gap-5 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+              <div className="bg-emerald-50 text-emerald-500 p-3 rounded-xl"><ShieldCheck size={20}/></div>
               <div className="flex-1">
-                <p className="text-[10px] uppercase font-bold text-gray-400">Future Fund (60%)</p>
-                <p className="text-sm font-bold text-gray-800 dark:text-slate-200">Into Emergency Fund</p>
+                <p className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mb-1">Future Fund (60%)</p>
+                <p className="text-sm font-bold text-slate-900">Emergency Cache</p>
               </div>
-              <p className="font-black text-blue-600">{formatCurrency(savingsAlloc)}</p>
+              <p className="font-bold text-emerald-600 text-xl">{formatCurrency(savingsAlloc)}</p>
             </div>
           </div>
-          <div className="space-y-3 pt-2">
-            <button onClick={onClose} className="w-full py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-xl font-bold hover:bg-black dark:hover:bg-blue-700 transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]">
-              LOG PAYMENTS NOW
+          <div className="pt-4">
+            <button onClick={onClose} className="w-full py-5 bg-vantage-950 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-black transition-all shadow-lg active:scale-[0.98]">
+              Commit Realignment
             </button>
-            <p className="text-center text-[10px] text-gray-400 uppercase font-bold tracking-widest">or manually allocate later</p>
           </div>
         </div>
       </div>
@@ -84,22 +95,19 @@ const Dashboard = () => {
   });
 
   if (isLoading) return (
-    <div className="space-y-6 animate-pulse p-1">
-      <div className="h-8 bg-gray-200 dark:bg-slate-800 rounded w-1/4"/>
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1,2,3,4,5,6].map(i => <div key={i} className="h-24 bg-gray-100 dark:bg-slate-800 rounded-xl"/>)}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="h-64 bg-gray-100 dark:bg-slate-800 rounded-xl"/>
-        <div className="h-64 bg-gray-100 dark:bg-slate-800 rounded-xl"/>
+    <div className="space-y-10 animate-pulse">
+      <div className="h-12 bg-slate-100 rounded-2xl w-1/3"/>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1,2,3,4,5,6].map(i => <div key={i} className="h-32 bg-slate-50 rounded-3xl"/>)}
       </div>
     </div>
   );
 
   if (isError || !summary) return (
-    <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-      <p className="font-medium">Could not load dashboard data.</p>
-      <p className="text-sm mt-1">Make sure the backend is running and try refreshing.</p>
+    <div className="flex flex-col items-center justify-center h-[50vh] text-slate-400">
+      <HeartPulse size={64} className="opacity-20 mb-6 animate-pulse" />
+      <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 mb-2">Sync Offline</h2>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Satellite link synchronizing...</p>
     </div>
   );
 
@@ -111,243 +119,200 @@ const Dashboard = () => {
   } = summary;
 
   const chartData = [...cash_flow].reverse();
-  const hasSurplus = net_cash_flow > 1000; // Only trigger for meaningful surplus
+  const hasSurplus = net_cash_flow > 1000;
 
   return (
-    <div className="space-y-8 pb-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="space-y-10">
+      {/* ── Header ────────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase tracking-widest">Global Overview</span>
-            <span className="w-1 h-1 bg-gray-300 dark:bg-white/10 rounded-full"></span>
-            <span className="text-gray-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-widest">Cycle: 25th - 24th</span>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="bg-blue-50 text-blue-600 text-[8px] font-bold uppercase tracking-[0.3em] px-2.5 py-1 rounded-full border border-blue-100">TELEMETRY LIVE</span>
+            <span className="text-slate-400 text-[8px] font-bold uppercase tracking-[0.2em] opacity-50">CYCLE TRACE ACTIVE</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
-            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-500">{user?.name || 'User'}</span>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-950 uppercase italic">
+            Welcome, <span className="text-blue-600">{user?.name?.split(' ')[0] || 'Member'}</span>
           </h1>
-          <p className="text-gray-500 dark:text-slate-400 mt-1 font-medium italic text-sm">"The future depends on what you do today." — Your Vantage Summary</p>
+          <p className="text-slate-400 mt-3 font-medium text-xs uppercase tracking-widest opacity-60">Precision wealth tracking established.</p>
         </div>
 
-        <div className={`px-4 py-2.5 rounded-2xl border flex items-center gap-3 shadow-sm ${
+        <div className={`px-6 py-4 rounded-2xl border flex items-center gap-4 transition-all ${
           net_cash_flow >= 0 
-            ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400' 
-            : 'bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-400'
+            ? 'bg-emerald-50/30 border-emerald-100/50 text-emerald-900' 
+            : 'bg-rose-50/30 border-rose-100/50 text-rose-900'
         }`}>
-          <HeartPulse size={20} className={net_cash_flow > 0 ? 'animate-pulse' : ''} />
+          <div className={`p-2.5 rounded-xl ${net_cash_flow >= 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+            <HeartPulse size={20} className={net_cash_flow > 0 ? 'animate-pulse' : ''} />
+          </div>
           <div>
-            <p className="text-[10px] uppercase font-bold tracking-tighter opacity-70 leading-tight">Financial Health</p>
-            <p className="text-sm font-black uppercase tracking-wide">{net_cash_flow >= 0 ? 'Surplus Growth' : 'Deficit Alert'}</p>
+            <p className="text-[9px] uppercase font-bold tracking-widest opacity-50 leading-none mb-1">Status</p>
+            <p className="text-sm font-bold uppercase tracking-tight">{net_cash_flow >= 0 ? 'Healthy' : 'Deficit Risk'}</p>
           </div>
         </div>
       </div>
 
-      {/* ── Spotlight: Next Debt Target ───────────────────────────────────────── */}
-      {hasSurplus && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between animate-bounce-subtle">
-           <div className="flex items-center gap-3">
-             <div className="p-2 bg-green-100 text-green-700 rounded-lg"><ArrowUpRight size={20}/></div>
-             <div>
-               <p className="text-sm font-bold text-green-800">You have a {formatCurrency(net_cash_flow)} surplus!</p>
-               <p className="text-xs text-green-600">Put this money to work before it disappears.</p>
-             </div>
-           </div>
-           <button onClick={() => setShowSweeper(true)} className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 transition shadow-sm">
-             SWEEP NOW
-           </button>
+      {/* ── Action Banners ────────────────────────────────────────────────────── */}
+      {(hasSurplus || target_debt) && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {hasSurplus && (
+            <div className="bg-emerald-50/50 border border-emerald-100/50 rounded-3xl p-8 flex items-center justify-between gap-6 transition-all hover:bg-emerald-50">
+              <div className="flex items-center gap-6">
+                <div className="p-4 bg-emerald-100 text-emerald-600 rounded-2xl shadow-sm"><Zap size={32}/></div>
+                <div>
+                  <p className="text-[9px] font-bold text-emerald-800/60 uppercase tracking-widest mb-1.5">Unallocated Liquidity</p>
+                  <h2 className="text-2xl font-bold text-emerald-950 tracking-tight">{formatCurrency(net_cash_flow)} Found</h2>
+                </div>
+              </div>
+              <button onClick={() => setShowSweeper(true)} className="bg-emerald-600 text-white px-6 py-3.5 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-md active:scale-95">
+                Execute
+              </button>
+            </div>
+          )}
+
+          {target_debt && (
+            <div className="bg-vantage-950 text-white rounded-3xl p-8 flex items-center justify-between gap-6 shadow-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+              <div className="flex items-center gap-6 relative z-10">
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
+                  <Target size={32} className="text-rose-400" />
+                </div>
+                <div>
+                  <p className="text-[9px] font-bold text-rose-400/60 uppercase tracking-widest mb-1.5">Priority Target</p>
+                  <h2 className="text-2xl font-bold tracking-tight italic">{target_debt.name}</h2>
+                </div>
+              </div>
+              <div className="text-right relative z-10">
+                <p className="text-[9px] text-white/40 uppercase font-bold tracking-widest mb-1">Exposure</p>
+                <p className="text-xl font-bold text-rose-400">{formatCurrency(target_debt.balance)}</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {target_debt && (
-        <div className="bg-gradient-to-r from-red-600 to-rose-600 rounded-2xl p-6 shadow-lg shadow-red-200/50 flex flex-col md:flex-row items-start md:items-center justify-between text-white">
-          <div className="flex items-center gap-5">
-            <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
-              <Target size={32} className="text-white" />
-            </div>
-            <div>
-              <p className="font-semibold text-red-100 uppercase tracking-wider text-xs mb-1">Current Target: Priority Wipeout</p>
-              <h2 className="text-3xl font-black mb-1">Destroy the {target_debt.name}</h2>
-              <p className="text-red-50 max-w-md text-sm leading-relaxed">
-                Based on your Snowball strategy, pay the minimums on everything else and throw every extra Rupee at this balance.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0 bg-white/10 p-4 rounded-xl border border-white/20 backdrop-blur-sm text-center md:text-right">
-            <p className="text-xs text-red-100 uppercase font-semibold">Remaining Balance</p>
-            <p className="text-2xl font-black">{formatCurrency(target_debt.balance)}</p>
-          </div>
-        </div>
-      )}
-
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Your complete financial overview.</p>
-      </div>
-
-      {/* ── 6 Metric Cards ────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* ── Metric Cards ────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <MetricCard title="Net Worth" amount={formatCurrency(net_worth)}
-          icon={<Wallet size={22}/>} isNegative={net_worth < 0}
-          subtitle="Savings minus total debt"/>
-        <MetricCard title="Monthly Income" amount={formatCurrency(monthly_income)}
+          icon={<ArrowUpRight size={22}/>} isNegative={net_worth < 0}
+          subtitle="Total Asset Logic"/>
+        <MetricCard title="Inbound Flux" amount={formatCurrency(monthly_income)}
           icon={<TrendingUp size={22}/>}
-          subtitle="Income this month"/>
-        <MetricCard title="Monthly Expenses" amount={formatCurrency(monthly_expenses)}
+          subtitle="Monthly Cycle Inflow"/>
+        <MetricCard title="Expenditure" amount={formatCurrency(monthly_expenses)}
           icon={<TrendingDown size={22}/>} isNegative={true}
-          subtitle="Spent this month"/>
-        <div className={`bg-white p-5 rounded-xl shadow-sm border flex items-center gap-4 hover:shadow-md transition-shadow ${net_cash_flow >= 0 ? 'border-green-100' : 'border-red-100'}`}>
-          <div className={`p-3.5 rounded-xl ${net_cash_flow >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-            {net_cash_flow >= 0 ? <ArrowUpRight size={22}/> : <ArrowDownRight size={22}/>}
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Net Cash Flow</p>
-            <h3 className={`text-xl font-extrabold ${net_cash_flow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {net_cash_flow >= 0 ? '+' : ''}{formatCurrency(net_cash_flow)}
-            </h3>
-            <p className="text-xs text-gray-400 mt-0.5">Income - Expenses</p>
-          </div>
-        </div>
-        <MetricCard title="Total Saved" amount={formatCurrency(total_saved)}
-          icon={<PiggyBank size={22}/>}
-          subtitle="Across all goals"/>
-        <MetricCard title="Total Debt" amount={formatCurrency(total_debt)}
+          subtitle="Cycle Consumption Trace"/>
+        <MetricCard title="Net Delta" amount={`${net_cash_flow >= 0 ? '+' : ''}${formatCurrency(net_cash_flow)}`}
+          icon={net_cash_flow >= 0 ? <ArrowUpRight size={22}/> : <ArrowDownRight size={22}/>}
+          isNetFlow={true}
+          subtitle="Strategic Alignment Flux"/>
+        <MetricCard title="Vault Cache" amount={formatCurrency(total_saved)}
+          icon={<ShieldCheck size={22}/>}
+          subtitle="Emergency Liquidity"/>
+        <MetricCard title="Liability" amount={formatCurrency(total_debt)}
           icon={<Landmark size={22}/>} isNegative={true}
-          subtitle="Active balances"/>
+          subtitle="Consolidated Exposure"/>
       </div>
 
-      {/* ── Charts Row ────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Income vs Expenses Bar Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-          <h3 className="text-base font-bold text-gray-900 mb-5">Income vs Expenses — Last 6 Months</h3>
-          <div className="h-64">
+      {/* ── Charts & Lists ────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white p-8 rounded-3xl border border-slate-200/50 shadow-sm">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight italic">Trajectory</h3>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">6-Month Flux Audit</p>
+            </div>
+            <TrendingUp size={20} className="text-slate-300" />
+          </div>
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} barGap={4}>
-                <XAxis dataKey="month" axisLine={false} tickLine={false}
-                  tick={{ fill: '#9ca3af', fontSize: 11 }}/>
-                <YAxis axisLine={false} tickLine={false}
-                  tick={{ fill: '#9ca3af', fontSize: 11 }}
-                  tickFormatter={v => `Rs ${(v/1000).toFixed(0)}k`}/>
-                <Tooltip
-                  formatter={(value, name) => [formatCurrency(value), name === 'income' ? 'Income' : 'Expenses']}
-                  contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 12px rgb(0 0 0 / 0.1)', fontSize: 12 }}/>
-                <Legend formatter={v => v === 'income' ? 'Income' : 'Expenses'} iconType="circle" iconSize={8}/>
-                <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} name="income"/>
-                <Bar dataKey="spent" fill="#f87171" radius={[4, 4, 0, 0]} name="spent"/>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94a3b8" opacity={0.1}/>
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#94a3b8', fontWeight: 700 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#94a3b8', fontWeight: 700 }} />
+                <Tooltip 
+                  cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)', fontSize: '10px', textTransform: 'uppercase' }}
+                />
+                <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} barSize={24} />
+                <Bar dataKey="spent" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={24} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Debt Breakdown Donut */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex flex-col">
-          <h3 className="text-base font-bold text-gray-900 mb-2">Debt Breakdown</h3>
-          {debt_breakdown.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400 font-medium">No active debts 🎉</div>
-          ) : (
-            <div className="h-64 flex items-center justify-center relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={debt_breakdown} innerRadius={68} outerRadius={90} paddingAngle={3}
-                    dataKey="balance" nameKey="name">
-                    {debt_breakdown.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={v => formatCurrency(v)}
-                    contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 12px rgb(0 0 0 / 0.1)', fontSize: 12 }}/>
-                  <Legend iconType="circle" iconSize={8} formatter={v => v.length > 18 ? v.slice(0, 18) + '…' : v}/>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute flex flex-col items-center" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                <span className="text-xs font-medium text-gray-400">Total</span>
-                <span className="font-extrabold text-gray-900 text-sm">{formatCurrency(total_debt)}</span>
-              </div>
+        <div className="bg-white p-8 rounded-3xl border border-slate-200/50 shadow-sm">
+          <div className="flex items-center justify-between mb-10">
+             <div>
+              <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight italic">Node Logs</h3>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Latest Inbound Events</p>
             </div>
-          )}
+            <ArrowUpRight className="text-emerald-500" size={24} />
+          </div>
+          <div className="space-y-4">
+            {recent_income.length === 0 ? (
+              <div className="h-48 flex flex-col items-center justify-center text-slate-300 gap-4 opacity-40">
+                 <Wallet size={48}/>
+                 <p className="font-bold uppercase tracking-widest text-[9px]">No Logs Detected</p>
+              </div>
+            ) : (
+              recent_income.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl transition-all hover:bg-slate-50">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-white text-emerald-500 p-2.5 rounded-xl shadow-sm"><ArrowUpRight size={18}/></div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm italic tracking-tight">{entry.description}</p>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">{format(parseISO(entry.date), 'dd MMM')} • {entry.category}</p>
+                    </div>
+                  </div>
+                  <span className="font-bold text-emerald-600 text-xl italic tracking-tighter">+{formatCurrency(entry.amount)}</span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ── Savings Progress ───────────────────────────────────────────────────── */}
+      {/* ── Resilience Target ────────────────────────────────────────────── */}
       {savings_progress.length > 0 && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-base font-bold text-gray-900 mb-5">Savings Goals Progress</h3>
-          <div className="space-y-7">
-            {savings_progress.map(goal => {
-              const isEmergency = goal.name.toLowerCase().includes('emergency');
-              const oneMonth = isEmergency ? monthly_expenses : 0;
-              const threeMonths = isEmergency ? monthly_expenses * 3 : 0;
-              const sixMonths = isEmergency ? monthly_expenses * 6 : 0;
-
-              return (
-              <div key={goal.name}>
-                <div className="flex justify-between items-end mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-800 text-sm">{goal.name}</span>
-                    {isEmergency && <ShieldCheck size={16} className="text-green-500"/>}
+        <div className="bg-white p-10 rounded-[2.5rem] border border-slate-200/50 shadow-sm">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900 uppercase tracking-tight italic">Resilience Profile</h3>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-2">Emergency Cache Optimization</p>
+            </div>
+            <ShieldCheck size={28} className="text-blue-500 opacity-30" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {savings_progress.map(goal => (
+              <div key={goal.name} className="space-y-6">
+                <div className="flex justify-between items-end">
+                  <div className="flex gap-4">
+                    <div className="bg-slate-50 p-2.5 rounded-xl text-slate-900"><PiggyBank size={20}/></div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-lg tracking-tight italic">{goal.name}</span>
+                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Vault Progress</p>
+                    </div>
                   </div>
-                  <div className="text-sm">
-                    <span className="font-bold text-green-600">{formatCurrency(goal.current)}</span>
-                    <span className="text-gray-400 mx-1">/</span>
-                    <span className="text-gray-500">{formatCurrency(goal.target)}</span>
+                  <div className="text-right">
+                     <p className="font-bold text-emerald-600 text-2xl italic tracking-tighter">{formatCurrency(goal.current)}</p>
                   </div>
                 </div>
                 
-                {/* Dynamically adjust max bar scale to show realistic milestones if Emergency */}
-                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden relative">
-                  <div className="bg-green-500 h-3 rounded-full transition-all duration-1000"
-                    style={{ width: `${goal.percentage}%` }}/>
-                    
-                  {/* Dynamic Milestones based on Monthly Expense */}
-                  {isEmergency && monthly_expenses > 0 && (
-                    <>
-                      {(oneMonth / goal.target) * 100 < 90 && (
-                        <div className="absolute top-0 bottom-0 border-l-2 border-white/60" style={{ left: `${(oneMonth / goal.target) * 100}%` }} title="1 Month Buffer"></div>
-                      )}
-                      {(threeMonths / goal.target) * 100 < 90 && (
-                        <div className="absolute top-0 bottom-0 border-l-2 border-white/60" style={{ left: `${(threeMonths / goal.target) * 100}%` }} title="3 Months Buffer"></div>
-                      )}
-                      {(sixMonths / goal.target) * 100 < 90 && (
-                        <div className="absolute top-0 bottom-0 border-l-2 border-blue-400" style={{ left: `${(sixMonths / goal.target) * 100}%` }} title="6 Months Secure"></div>
-                      )}
-                    </>
-                  )}
+                <div className="w-full bg-slate-50 rounded-2xl h-6 p-1 overflow-hidden relative border border-slate-100">
+                  <div className="bg-emerald-500 h-full rounded-xl transition-all duration-1000 shadow-sm"
+                    style={{ width: `${goal.percentage}%` }}>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center mt-1.5">
-                  {isEmergency && monthly_expenses > 0 ? (
-                    <div className="flex gap-4 text-[10px] text-gray-400 font-medium">
-                      <span>1M: {formatCurrency(oneMonth)}</span>
-                      <span>3M: {formatCurrency(threeMonths)}</span>
-                      <span className="text-blue-500/80">6M Target: {formatCurrency(sixMonths)}</span>
-                    </div>
-                  ) : (
-                    <div></div>
-                  )}
-                  <p className="text-xs text-gray-400 font-medium">{goal.percentage.toFixed(1)}%</p>
-                </div>
-              </div>
-            )})}
-          </div>
-        </div>
-      )}
 
-      {/* ── Recent Income ──────────────────────────────────────────────────────── */}
-      {recent_income.length > 0 && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-base font-bold text-gray-900 mb-4">Recent Income</h3>
-          <div className="space-y-3">
-            {recent_income.map((entry, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                <div>
-                  <p className="font-semibold text-gray-800 text-sm">{entry.description}</p>
-                  <p className="text-xs text-gray-400">{entry.date} · {entry.category}</p>
+                <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest">
+                  <span className="text-slate-400 italic">Target: {formatCurrency(goal.target)}</span>
+                  <span className="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md">{goal.percentage.toFixed(1)}% Efficiency</span>
                 </div>
-                <span className="font-bold text-green-600 text-sm">+ {formatCurrency(entry.amount)}</span>
               </div>
             ))}
           </div>
         </div>
       )}
-      {/* ── Modals ────────────────────────────────────────────────────────────── */}
       {showSweeper && (
         <SweeperModal 
           surplus={net_cash_flow} 
