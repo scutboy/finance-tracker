@@ -64,7 +64,7 @@ const Debt = () => {
     queryFn: async () => (await api.get('/debts/')).data,
   });
 
-  const allPayments = debts?.flatMap(d => d.payments.map(p => ({ ...p, debtName: d.name })))
+  const allPayments = debts?.flatMap(d => (d.payments || []).map(p => ({ ...p, debtName: d.name })))
     .sort((a,b) => new Date(b.payment_date) - new Date(a.payment_date)) || [];
 
   return (
