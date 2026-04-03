@@ -1,15 +1,32 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './context/AuthContext';
+import Layout from './components/Layout';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+
+const queryClient = new QueryClient();
 
 function App() {
-  console.log("Nuclear App Test rendering...");
+  console.log("[App] Vantage v3 Core Mounting...");
   return (
-    <div style={{ padding: '100px', textAlign: 'center', backgroundColor: '#f0f9ff', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: '48px', color: '#1e40af', fontWeight: '900' }}>VANTAGE: NUCLEAR TEST SUCCESS</h1>
-      <p style={{ marginTop: '20px', color: '#64748b' }}>If you can see this, the JavaScript bundle is loading correctly.</p>
-      <div style={{ marginTop: '50px', padding: '20px', border: '1px solid #e2e8f0', display: 'inline-block' }}>
-        Current Runtime: {new Date().toLocaleTimeString()}
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
