@@ -69,8 +69,8 @@ const Dashboard = () => {
              <span className="bg-slate-950 text-white text-[9px] font-black uppercase tracking-[0.4em] px-4 py-2 rounded-full italic">Status: Online</span>
              <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 italic underline-offset-8 decoration-1 decoration-slate-200">Terminal ID: LKR-001</span>
           </div>
-          <h1 className="text-5xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Console</h1>
-          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 leading-none italic ml-1">Real-time systemic oversight.</p>
+          <h1 className="text-5xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Welcome, {firstName}</h1>
+          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 leading-none italic ml-1">Real-time systemic oversight for {user?.name}.</p>
         </div>
         <div className="flex items-center gap-8 p-6 bg-white border border-slate-100 rounded-[3rem] shadow-2xl hover:shadow-3xl transition-all duration-700 min-w-[320px] group">
            <div className="p-6 bg-blue-50 text-blue-600 rounded-full group-hover:scale-110 transition-transform"><Activity size={28} className="animate-pulse" /></div>
@@ -154,9 +154,11 @@ const Dashboard = () => {
                    </div>
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic opacity-60">Multi-Channel Flux Optimization Persistent</p>
                 </div>
-                <button className="flex items-center gap-4 bg-white/5 hover:bg-white/10 text-white px-10 py-5 rounded-[2rem] border border-white/5 transition-all font-black uppercase tracking-[0.5em] text-[10px] italic shadow-2xl group/btn">
+                 <button 
+                  onClick={() => window.location.href = '/debt-advisor'}
+                  className="flex items-center gap-4 bg-white/5 hover:bg-white/10 text-white px-10 py-5 rounded-[2rem] border border-white/5 transition-all font-black uppercase tracking-[0.5em] text-[10px] italic shadow-2xl group/btn">
                    Launch Matrix <ArrowUpRight size={18} className="group-hover/btn:translate-x-2 group-hover/btn:-translate-y-2 transition-all duration-500"/>
-                </button>
+                 </button>
             </div>
          </div>
 
@@ -180,20 +182,20 @@ const Dashboard = () => {
                  </div>
                ) : (
                  summary?.recent_income?.slice(0, 4).map((txn, idx) => (
-                   <div key={idx} className="flex items-center justify-between group/item p-3 hover:bg-slate-50 rounded-[2rem] transition-all duration-500 cursor-default">
-                      <div className="flex items-center gap-6">
-                         <div className={`p-4 rounded-2xl shadow-sm transition-all duration-500 group-hover/item:scale-110 group-hover/item:rotate-12 ${txn.type === 'income' ? 'bg-emerald-50 text-emerald-500 border border-emerald-100 shadow-emerald-500/5' : 'bg-rose-50 text-rose-500 border border-rose-100 shadow-rose-500/5'}`}>
-                            {txn.type === 'income' ? <ArrowUpRight size={22}/> : <ArrowDownRight size={22}/>}
-                         </div>
-                         <div>
-                            <p className="text-xl font-black text-slate-950 tracking-tighter italic uppercase leading-none mb-3 group-hover/item:text-blue-600 transition-colors">{txn.description}</p>
-                            <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic leading-none">{txn.category} ── {txn.date}</p>
-                         </div>
-                      </div>
-                      <p className={`text-2xl font-black italic tracking-tighter leading-none group-hover/item:scale-110 transition-transform duration-500 ${txn.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount)}
-                      </p>
-                   </div>
+                   <div key={idx} className="flex items-center justify-between group/item p-2 hover:bg-slate-50/50 rounded-[1.5rem] transition-all duration-500 cursor-default">
+                       <div className="flex items-center gap-5">
+                          <div className={`p-3 rounded-2xl shadow-sm transition-all duration-500 group-hover/item:scale-110 group-hover/item:rotate-12 ${txn.type === 'income' ? 'bg-emerald-50 text-emerald-500 border border-emerald-100' : 'bg-rose-50 text-rose-500 border border-rose-100'}`}>
+                             {txn.type === 'income' ? <ArrowUpRight size={18}/> : <ArrowDownRight size={18}/>}
+                          </div>
+                          <div>
+                             <p className="text-lg font-black text-slate-950 tracking-tighter italic uppercase leading-none mb-2 group-hover/item:text-blue-600 transition-colors">{txn.description}</p>
+                             <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic leading-none">{txn.category} ── {txn.date}</p>
+                          </div>
+                       </div>
+                       <p className={`text-xl font-black italic tracking-tighter leading-none group-hover/item:scale-110 transition-transform duration-500 ${txn.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                         {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount)}
+                       </p>
+                    </div>
                  ))
                )}
             </div>
@@ -217,11 +219,11 @@ const Dashboard = () => {
             </div>
             <Target size={36} className="text-slate-200 group-hover:text-emerald-500 transition-all duration-700 hover:-rotate-12" />
          </div>
-         <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.7em] italic px-12 leading-[2.5] relative z-10 max-w-5xl mx-auto opacity-40 group-hover:opacity-100 transition-opacity duration-700">Analytical Management Overlay v4.2.1 -- System Real-time Flux monitoring persistent -- Integrity Cluster Verified.</p>
+         <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.7em] italic px-12 leading-[2.5] relative z-10 max-w-5xl mx-auto opacity-40 group-hover:opacity-100 transition-opacity duration-700">© 2026 {user?.name}. Vantage Strategy v4.2 -- Operational Logic Persistent -- All Assets Verified.</p>
          <div className="mt-8 flex justify-center gap-8 opacity-20 group-hover:opacity-100 transition-all duration-1000">
-            <span className="text-[8px] font-black uppercase tracking-[0.8em] text-blue-600">CLUSTER_LOAD: 12.4%</span>
-            <span className="text-[8px] font-black uppercase tracking-[0.8em] text-emerald-600">LATENCY: 14ms</span>
-            <span className="text-[8px] font-black uppercase tracking-[0.8em] text-amber-600">ENCRYPTION: AES_GCM_HARDWARE</span>
+            <span className="text-[8px] font-black uppercase tracking-[0.8em] text-blue-600">SYSTEM_HEALTH: NOMINAL</span>
+            <span className="text-[8px] font-black uppercase tracking-[0.8em] text-emerald-600">SYNC_STATUS: ACTIVE</span>
+            <span className="text-[8px] font-black uppercase tracking-[0.8em] text-amber-600">VANTAGE_v4.2</span>
          </div>
       </div>
     </div>
