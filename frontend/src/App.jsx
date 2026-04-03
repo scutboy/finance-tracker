@@ -15,14 +15,7 @@ import Savings from './pages/Savings';
 import Budget from './pages/Budget';
 import Settings from './pages/Settings';
 
-// Placeholder or Advanced Modules (Linked in Sidebar)
-const DebtAdvisor = () => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8 animate-scale-in">
-    <div className="p-10 bg-slate-950 text-white rounded-[3rem] shadow-2xl shadow-blue-500/20"><span className="text-4xl font-black italic uppercase italic">A-Node</span></div>
-    <h1 className="text-5xl font-black text-slate-950 uppercase italic tracking-tighter">Debt Advisor Locked</h1>
-    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] italic">Vantage AI Advisory Cluster Initializing...</p>
-  </div>
-);
+import DebtAdvisor from './pages/DebtAdvisor';
 
 const queryClient = new QueryClient();
 
