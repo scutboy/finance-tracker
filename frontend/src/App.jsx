@@ -1,20 +1,30 @@
 import React from 'react';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
+import Layout from './components/Layout';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
 const queryClient = new QueryClient();
 
-// PROBE: STRIPPED APP
 function App() {
-  console.log("[App] Vantage v3 Bypass Probe Active...");
+  console.log("[App] Vantage v3 Stable Routing Active...");
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div style={{ padding: '20px', border: '5px solid #2563eb', margin: '20px', borderRadius: '24px' }}>
-          <h2 style={{ color: '#2563eb', fontWeight: '900', marginBottom: '20px' }}>[BYPASS: NO ROUTER]</h2>
-          <Dashboard />
-        </div>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </Router>
       </AuthProvider>
     </QueryClientProvider>
   );
