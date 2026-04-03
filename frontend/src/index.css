@@ -13,17 +13,12 @@
   }
 
   html, body {
-    @apply h-full overflow-hidden m-0 p-0;
+    @apply h-full m-0 p-0;
   }
   
   body {
-    @apply bg-vantage-50 text-vantage-900 antialiased selection:bg-blue-600/10;
+    @apply bg-slate-50 text-slate-900 antialiased selection:bg-blue-600/10 overflow-y-auto;
     font-feature-settings: "cv02", "cv05", "cv11";
-  }
-
-  /* Force light mode styles for now to fix the "mess" */
-  * {
-    @apply border-slate-200/60;
   }
 }
 
@@ -56,14 +51,16 @@
   }
 }
 
-/* Custom Chart Tooltip Prototypes */
 .recharts-tooltip-wrapper {
    @apply outline-none !important;
 }
 
-/* Explicitly disable dark mode inversion for browsers/extensions */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: light;
+  }
+  body {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
   }
 }

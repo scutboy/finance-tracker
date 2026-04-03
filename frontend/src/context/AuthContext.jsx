@@ -10,15 +10,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('token');
+      console.log("[Auth] Init triggered, token detected:", !!token);
       if (token) {
         try {
           const res = await api.get('/auth/me');
+          console.log("[Auth] User profile retrieved:", res.data?.email || "Unknown");
           setUser(res.data);
         } catch (error) {
+          console.error("[Auth] Initialization failure:", error.message);
           localStorage.removeItem('token');
         }
       }
       setLoading(false);
+      console.log("[Auth] Initialization complete, rendering children");
     };
     initAuth();
   }, []);
@@ -49,7 +53,11 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-      {!loading && children}
+      {!loading ? children : (
+        <div className="flex items-center justify-center min-h-screen bg-vantage-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-vantage-blue border-t-transparent"></div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 };
