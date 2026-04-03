@@ -6,20 +6,21 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, Legend
 } from 'recharts';
-import { Wallet, Landmark, TrendingDown, PiggyBank, TrendingUp, ArrowUpRight, ArrowDownRight, Target, ShieldCheck } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Wallet, Landmark, TrendingDown, PiggyBank, TrendingUp, ArrowUpRight, ArrowDownRight, Target, ShieldCheck, HeartPulse, Zap, X } from 'lucide-react';
 import Confetti from 'react-confetti';
 
 const COLORS = ['#A32D2D', '#854F0B', '#185FA5', '#3B6D11', '#4A5568'];
 
 const MetricCard = ({ title, amount, icon, isNegative = false, subtitle = null }) => (
-  <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-    <div className={`p-3.5 rounded-xl ${isNegative ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+  <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-white/5 flex items-center gap-4 hover:shadow-md transition-shadow group">
+    <div className={`p-3.5 rounded-xl transition-colors ${isNegative ? 'bg-red-50 dark:bg-red-500/10 text-red-600' : 'bg-green-50 dark:bg-green-500/10 text-green-600'}`}>
       {icon}
     </div>
     <div className="min-w-0">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{title}</p>
-      <h3 className={`text-xl font-extrabold truncate ${isNegative ? 'text-red-600' : 'text-gray-900'}`}>{amount}</h3>
-      {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+      <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">{title}</p>
+      <h3 className={`text-xl font-extrabold truncate dark:text-white ${isNegative ? 'text-red-600' : 'text-gray-900'}`}>{amount}</h3>
+      {subtitle && <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{subtitle}</p>}
     </div>
   </div>
 );
@@ -30,39 +31,39 @@ const SweeperModal = ({ surplus, onClose, targetDebt, emergencyGoal }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div className="bg-green-600 p-8 text-white text-center relative">
+      <div className="bg-white dark:bg-slate-950 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-white/10">
+        <div className="bg-gradient-to-br from-green-600 to-emerald-700 p-8 text-white text-center relative">
           <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white transition"><X size={20}/></button>
           <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
-            <TrendingUp size={32} />
+            <Zap size={32} />
           </div>
           <h2 className="text-2xl font-black italic">SURPLUS DETECTED!</h2>
           <p className="text-green-100 font-medium">You have {formatCurrency(surplus)} leftover this cycle.</p>
         </div>
         <div className="p-8 space-y-6">
-          <p className="text-gray-600 text-sm leading-relaxed text-center">
+          <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed text-center">
             Don't let it sit! Your smart swept plan allocates this to achieve your goals faster:
           </p>
           <div className="space-y-4">
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="bg-red-100 text-red-600 p-2 rounded-lg"><Target size={18}/></div>
+            <div className="flex items-center gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5">
+              <div className="bg-red-100 dark:bg-red-500/20 text-red-600 p-2 rounded-lg"><Target size={18}/></div>
               <div className="flex-1">
                 <p className="text-[10px] uppercase font-bold text-gray-400">Debt Sniper (40%)</p>
-                <p className="text-sm font-bold text-gray-800">Pay off {targetDebt?.name || 'highest balance'}</p>
+                <p className="text-sm font-bold text-gray-800 dark:text-slate-200">Pay off {targetDebt?.name || 'highest balance'}</p>
               </div>
               <p className="font-black text-red-600">{formatCurrency(debtAlloc)}</p>
             </div>
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <div className="bg-blue-100 text-blue-600 p-2 rounded-lg"><ShieldCheck size={18}/></div>
+            <div className="flex items-center gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-100 dark:border-white/5">
+              <div className="bg-blue-100 dark:bg-blue-500/20 text-blue-600 p-2 rounded-lg"><ShieldCheck size={18}/></div>
               <div className="flex-1">
                 <p className="text-[10px] uppercase font-bold text-gray-400">Future Fund (60%)</p>
-                <p className="text-sm font-bold text-gray-800">Into Emergency Fund</p>
+                <p className="text-sm font-bold text-gray-800 dark:text-slate-200">Into Emergency Fund</p>
               </div>
               <p className="font-black text-blue-600">{formatCurrency(savingsAlloc)}</p>
             </div>
           </div>
           <div className="space-y-3 pt-2">
-            <button onClick={onClose} className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]">
+            <button onClick={onClose} className="w-full py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-xl font-bold hover:bg-black dark:hover:bg-blue-700 transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]">
               LOG PAYMENTS NOW
             </button>
             <p className="text-center text-[10px] text-gray-400 uppercase font-bold tracking-widest">or manually allocate later</p>
@@ -74,6 +75,7 @@ const SweeperModal = ({ surplus, onClose, targetDebt, emergencyGoal }) => {
 };
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [showSweeper, setShowSweeper] = React.useState(false);
   const { data: summary, isLoading, isError } = useQuery({
     queryKey: ['dashboardSummary'],
@@ -83,13 +85,13 @@ const Dashboard = () => {
 
   if (isLoading) return (
     <div className="space-y-6 animate-pulse p-1">
-      <div className="h-8 bg-gray-200 rounded w-1/4"/>
+      <div className="h-8 bg-gray-200 dark:bg-slate-800 rounded w-1/4"/>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1,2,3,4,5,6].map(i => <div key={i} className="h-24 bg-gray-100 rounded-xl"/>)}
+        {[1,2,3,4,5,6].map(i => <div key={i} className="h-24 bg-gray-100 dark:bg-slate-800 rounded-xl"/>)}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="h-64 bg-gray-100 rounded-xl"/>
-        <div className="h-64 bg-gray-100 rounded-xl"/>
+        <div className="h-64 bg-gray-100 dark:bg-slate-800 rounded-xl"/>
+        <div className="h-64 bg-gray-100 dark:bg-slate-800 rounded-xl"/>
       </div>
     </div>
   );
@@ -112,7 +114,33 @@ const Dashboard = () => {
   const hasSurplus = net_cash_flow > 1000; // Only trigger for meaningful surplus
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase tracking-widest">Global Overview</span>
+            <span className="w-1 h-1 bg-gray-300 dark:bg-white/10 rounded-full"></span>
+            <span className="text-gray-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-widest">Cycle: 25th - 24th</span>
+          </div>
+          <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
+            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-500">{user?.name || 'User'}</span>
+          </h1>
+          <p className="text-gray-500 dark:text-slate-400 mt-1 font-medium italic text-sm">"The future depends on what you do today." — Your Vantage Summary</p>
+        </div>
+
+        <div className={`px-4 py-2.5 rounded-2xl border flex items-center gap-3 shadow-sm ${
+          net_cash_flow >= 0 
+            ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400' 
+            : 'bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-400'
+        }`}>
+          <HeartPulse size={20} className={net_cash_flow > 0 ? 'animate-pulse' : ''} />
+          <div>
+            <p className="text-[10px] uppercase font-bold tracking-tighter opacity-70 leading-tight">Financial Health</p>
+            <p className="text-sm font-black uppercase tracking-wide">{net_cash_flow >= 0 ? 'Surplus Growth' : 'Deficit Alert'}</p>
+          </div>
+        </div>
+      </div>
+
       {/* ── Spotlight: Next Debt Target ───────────────────────────────────────── */}
       {hasSurplus && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between animate-bounce-subtle">
