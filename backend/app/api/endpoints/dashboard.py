@@ -103,6 +103,13 @@ def get_dashboard_summary(
             "net": round(month_income - month_expense, 2),
         })
 
+    # Calculate Hourly interest leakage (simplified average APR)
+    total_hourly_leakage = 0.0
+    for d in active_debts:
+        # monthly rate = apr/100/12, hourly = monthly/30/24
+        hourly_rate = (d.interest_rate / 100) / 365 / 24
+        total_hourly_leakage += d.balance * hourly_rate
+
     # ── Recent Income entries (last 5) ────────────────────────────────────────
     recent_income = db.query(models.Income).filter(
         models.Income.user_id == current_user.id
@@ -115,6 +122,7 @@ def get_dashboard_summary(
         "monthly_expenses": round(current_month_expenses, 2),
         "monthly_income": round(current_month_income, 2),
         "net_cash_flow": round(net_cash_flow, 2),
+        "hourly_leakage": round(total_hourly_leakage, 4),
         "cash_flow": cash_flow,
         "savings_progress": savings_progress,
         "debt_breakdown": debt_breakdown,
