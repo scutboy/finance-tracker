@@ -53,7 +53,7 @@ const Layout = () => {
             </div>
             <div className="lg:hidden flex items-center gap-3">
               <div className="p-2 bg-slate-950 rounded-lg"><Shield size={16} className="text-white"/></div>
-              <span className="text-sm font-black italic tracking-tighter text-slate-950 uppercase leading-none">Hiruni's Vantage</span>
+              <span className="text-sm font-black italic tracking-tighter text-slate-950 uppercase leading-none">Charith's Vantage</span>
             </div>
           </div>
           

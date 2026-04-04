@@ -43,7 +43,7 @@ const Sidebar = ({ mobile = false, onClose }) => {
             <Shield className="text-white" size={20} />
           </div>
           <div className="flex flex-col">
-            <span className="text-[8px] font-black text-slate-400 tracking-[0.4em] mb-0.5 italic">HIRUNI'S VANTAGE</span>
+            <span className="text-[8px] font-black text-slate-400 tracking-[0.4em] mb-0.5 italic">CHARITH'S VANTAGE</span>
             <span className="text-slate-950 tracking-tighter text-xl font-black italic uppercase leading-none">Strategy</span>
           </div>
         </div>
