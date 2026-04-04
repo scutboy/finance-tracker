@@ -16,6 +16,7 @@ import Budget from './pages/Budget';
 import Settings from './pages/Settings';
 
 import DebtAdvisor from './pages/DebtAdvisor';
+import Subscriptions from './pages/Subscriptions';
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ function App() {
               <Route path="/expenses" element={<Expenses />} />
               <Route path="/debt" element={<Debt />} />
               <Route path="/debt-advisor" element={<DebtAdvisor />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
               <Route path="/savings" element={<Savings />} />
               <Route path="/budget" element={<Budget />} />
               <Route path="/settings" element={<Settings />} />

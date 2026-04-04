@@ -135,7 +135,7 @@ const Debt = () => {
              <span className="bg-rose-600 text-white text-[8px] font-black uppercase tracking-[0.4em] px-3 py-1.5 rounded-full italic">Sniper: Core</span>
              <span className="text-slate-300 text-[9px] font-black uppercase tracking-[0.4em] opacity-40 ml-2 tracking-[0.6em] italic">Active Perimeter Scan</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Debt Sniper</h1>
+          <h1 className="text-3xl lg:text-4xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Debt Sniper</h1>
           <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 italic ml-1 leading-none">High-Precision target neutralization.</p>
         </div>
         <button onClick={() => setFormModal({ open: true, editItem: null })}
@@ -148,7 +148,7 @@ const Debt = () => {
          <div className="bg-slate-950 rounded-[2.5rem] p-10 shadow-3xl border border-white/5 relative overflow-hidden group min-h-[220px] flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-rose-600/10 rounded-full blur-[80px] pointer-events-none group-hover:scale-150 transition-all duration-[4000ms]"></div>
             <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.4em] italic relative z-10">Combined Exposure Delta</p>
-            <p className="text-4xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(activeTargets.reduce((s,d)=>s+d.balance, 0))}</p>
+            <p className="text-3xl lg:text-4xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(activeTargets.reduce((s,d)=>s+d.balance, 0))}</p>
             <span className="text-[8px] font-black uppercase tracking-[0.5em] text-white/20 italic relative z-10 leading-none">Threat Level: NOMINAL</span>
          </div>
          <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-xl transition-all h-[220px]">
@@ -180,7 +180,7 @@ const Debt = () => {
                      <span className="text-[9px] font-black text-slate-300 tracking-widest uppercase">{debt.type}</span>
                   </td>
                   <td className="px-10 py-10 text-right font-black text-rose-600 text-3xl tracking-tighter">{debt.interest_rate}%</td>
-                  <td className="px-10 py-10 text-right font-black text-slate-950 text-4xl tracking-tighter">{formatCurrency(debt.balance)}</td>
+                  <td className="px-10 py-10 text-right font-black text-slate-950 text-2xl lg:text-4xl tracking-tighter">{formatCurrency(debt.balance)}</td>
                   <td className="px-10 py-10 text-right">
                      <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
                       <button onClick={() => setPaymentModal({ open: true, debt })} className="px-6 py-4 bg-slate-950 text-white rounded-2xl shadow-xl flex items-center gap-3 text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">

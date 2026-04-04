@@ -91,7 +91,7 @@ const DebtAdvisor = () => {
              <span className="bg-blue-600 text-white text-[8px] font-black uppercase tracking-[0.4em] px-3 py-1.5 rounded-full">Strategic Node: Alpha</span>
              <span className="text-slate-300 text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-2 tracking-[0.7em]">Methodology Comparison Active</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tighter text-slate-950 uppercase leading-none">Strategic Delta</h1>
+          <h1 className="text-3xl lg:text-4xl font-black tracking-tighter text-slate-950 uppercase leading-none">Strategic Delta</h1>
           <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 ml-1">AI-Driven liability dissolution & flux simulation.</p>
         </div>
         <div className="flex bg-slate-950 p-2 rounded-[1.5rem] shadow-2xl items-center gap-4 border border-white/5 pr-4">
@@ -104,7 +104,7 @@ const DebtAdvisor = () => {
          <div className="bg-slate-950 rounded-[2rem] p-10 shadow-2xl border border-white/5 relative overflow-hidden group min-h-[220px] flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/10 rounded-full blur-[80px] pointer-events-none group-hover:scale-150 transition-all duration-[4000ms]"></div>
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] relative z-10">Aggregate Liability</p>
-            <p className="text-4xl font-black text-white tracking-tighter relative z-10">{formatCurrency(proj?.total_debt || activeDebts.reduce((s,d)=>s+d.balance, 0))}</p>
+            <p className="text-3xl lg:text-4xl font-black text-white tracking-tighter relative z-10">{formatCurrency(proj?.total_debt || activeDebts.reduce((s,d)=>s+d.balance, 0))}</p>
             <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 relative z-10 opacity-40">System Audit Nominal</span>
          </div>
          <div className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-xl transition-all">
@@ -148,7 +148,7 @@ const DebtAdvisor = () => {
                <div className="flex gap-16 lg:border-l lg:border-white/20 lg:pl-16 w-full lg:w-auto justify-center lg:justify-start relative z-10">
                   <div className="group/item">
                      <p className="text-[11px] font-black uppercase opacity-60 mb-3 italic tracking-widest text-emerald-100">Time Reclaimed</p>
-                     <p className="text-6xl font-black italic tracking-tighter scale-100 group-hover/item:scale-105 transition-transform origin-left">{proj.months_saved_vs_baseline || 0} <span className="text-lg opacity-40 ml-1">MO</span></p>
+                     <p className="text-3xl lg:text-6xl font-black italic tracking-tighter scale-100 group-hover/item:scale-105 transition-transform origin-left">{proj.months_saved_vs_baseline || 0} <span className="text-lg opacity-40 ml-1">MO</span></p>
                   </div>
                   <div className="group/item">
                      <p className="text-[11px] font-black uppercase opacity-60 mb-3 italic tracking-widest text-emerald-100">Avoided Leakage</p>
@@ -170,7 +170,7 @@ const DebtAdvisor = () => {
                <div className="flex items-center gap-3"><div className="w-3 h-3 rounded-full bg-purple-500/20 border border-purple-500 border-dashed"></div> Snowball Trace</div>
             </div>
          </div>
-         <div className="h-[450px] w-full relative z-10 px-4">
+         <div className="h-[300px] lg:h-[450px] w-full relative z-10 px-4">
             <ResponsiveContainer width="100%" height="100%">
                <AreaChart data={chart}>
                  <defs>
@@ -201,7 +201,7 @@ const DebtAdvisor = () => {
                     <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-xl font-black italic transition-all group-hover/item:scale-110 group-hover/item:rotate-6 ${idx === 0 ? 'bg-slate-950 text-white shadow-2xl' : 'bg-slate-100 text-slate-400'}`}>{idx + 1}</div>
                     <div className="flex-1">
                        <div className="flex justify-between items-end mb-4">
-                          <p className="font-black text-slate-950 text-2xl tracking-tighter uppercase italic group-hover/item:text-blue-600 transition-colors leading-none">{item.name}</p>
+                          <p className="font-black text-slate-950 text-xl lg:text-2xl tracking-tighter uppercase italic group-hover/item:text-blue-600 transition-colors leading-none">{item.name}</p>
                           <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Day {item.paid_month * 30}</p>
                        </div>
                        <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden border border-slate-200/50 relative group-hover/item:h-5 transition-all">

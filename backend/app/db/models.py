@@ -146,3 +146,19 @@ class BudgetCategory(Base):
     type = Column(SQLAlchemyEnum(BudgetCategoryTypeEnum), nullable=False)
 
     owner = relationship("User")
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)
+    billing_day = Column(Integer, nullable=False) # day of the month
+    category = Column(String)
+    linked_card_id = Column(Integer, ForeignKey("debts.id"), nullable=True)
+    status = Column(String, default="active") # active, cancelled, paused
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    owner = relationship("User")
+    linked_card = relationship("Debt")

@@ -146,3 +146,21 @@ class UserUpdate(BaseModel):
 class PasswordUpdate(BaseModel):
     old_password: str
     new_password: str
+
+class SubscriptionBase(BaseModel):
+    name: str
+    amount: float
+    billing_day: int
+    category: Optional[str] = None
+    linked_card_id: Optional[int] = None
+    status: str = "active"
+
+class SubscriptionCreate(SubscriptionBase):
+    pass
+
+class SubscriptionResponse(SubscriptionBase):
+    id: int
+    user_id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True

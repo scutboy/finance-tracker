@@ -28,6 +28,7 @@ const Sidebar = ({ mobile = false, onClose }) => {
     { name: 'Expense Trace', path: '/expenses', icon: Receipt },
     { name: 'Debt Sniper', path: '/debt', icon: CreditCard },
     { name: 'Debt Advisor', path: '/debt-advisor', icon: Brain },
+    { name: 'Subscriptions', path: '/subscriptions', icon: Zap },
     { name: 'Savings Core', path: '/savings', icon: PiggyBank },
     { name: 'Budget Guard', path: '/budget', icon: Wallet },
     { name: 'Settings', path: '/settings', icon: Settings },
