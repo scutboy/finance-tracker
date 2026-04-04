@@ -7,7 +7,7 @@ import Layout from './components/Layout';
 // Core Pages (Standardized v3.1)
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard_v4';
 import Income from './pages/Income';
 import Expenses from './pages/Expenses';
 import Debt from './pages/Debt';
@@ -20,7 +20,7 @@ import DebtAdvisor from './pages/DebtAdvisor';
 const queryClient = new QueryClient();
 
 function App() {
-  console.log("[App] Vantage v3.1 Logic Restoration Sequence...");
+  console.log("[App] Vantage v4.2.1 PLATINUM Deployment Stable.");
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
