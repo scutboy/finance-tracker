@@ -148,7 +148,7 @@ const Debt = () => {
          <div className="bg-slate-950 rounded-[2.5rem] p-10 shadow-3xl border border-white/5 relative overflow-hidden group min-h-[220px] flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-rose-600/10 rounded-full blur-[80px] pointer-events-none group-hover:scale-150 transition-all duration-[4000ms]"></div>
             <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.4em] italic relative z-10">Combined Exposure Delta</p>
-            <p className="text-5xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(activeTargets.reduce((s,d)=>s+d.balance, 0))}</p>
+            <p className="text-4xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(activeTargets.reduce((s,d)=>s+d.balance, 0))}</p>
             <span className="text-[8px] font-black uppercase tracking-[0.5em] text-white/20 italic relative z-10 leading-none">Threat Level: NOMINAL</span>
          </div>
          <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-xl transition-all h-[220px]">
