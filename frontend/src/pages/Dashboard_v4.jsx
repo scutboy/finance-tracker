@@ -118,7 +118,7 @@ const Dashboard = () => {
              <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 leading-none italic">GLOBAL_SYNCHRONY</span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-slate-950 uppercase leading-none italic">Welcome, {firstName}</h1>
-          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 leading-none ml-1 italic">Real-time systemic oversight for {user?.name}.</p>
+          <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 leading-none ml-1 italic">Real-time systemic oversight for Hiruni.</p>
         </div>
         <div className={`flex items-center gap-6 lg:gap-8 p-6 lg:p-8 ${healthStatus.bg} rounded-[2.5rem] lg:rounded-[3rem] shadow-2xl transition-all duration-700 min-w-full lg:min-w-[360px] group border border-slate-100`}>
            <div className={`p-4 lg:p-6 bg-white rounded-full ${healthStatus.color} shadow-lg transition-transform group-hover:scale-110`}><healthStatus.icon size={28} className={healthStatus.label === 'SYNCHRONIZING...' ? 'animate-spin' : 'animate-pulse'} /></div>
