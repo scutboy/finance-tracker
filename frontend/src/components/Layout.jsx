@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useAuth } from '../context/AuthContext';
-import { Menu, Activity, ShieldCircle } from 'lucide-react';
+import { Menu, Activity, Shield } from 'lucide-react';
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -52,7 +52,7 @@ const Layout = () => {
               <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none opacity-80">v4.2.1 PLATINUM</span>
             </div>
             <div className="lg:hidden flex items-center gap-3">
-              <div className="p-2 bg-slate-950 rounded-lg"><ShieldCircle size={16} className="text-white"/></div>
+              <div className="p-2 bg-slate-950 rounded-lg"><Shield size={16} className="text-white"/></div>
               <span className="text-sm font-black italic tracking-tighter text-slate-950 uppercase leading-none">Strategy</span>
             </div>
           </div>
