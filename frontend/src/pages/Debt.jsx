@@ -12,7 +12,9 @@ import {
   Calendar,
   ChevronRight,
   ShieldAlert,
-  Zap
+  Zap,
+  Percent,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -60,6 +62,7 @@ const DebtFormModal = ({ editItem = null, onClose, onSuccess }) => {
   const [form, setForm] = useState({
     name: editItem?.name || '',
     balance: editItem?.balance ?? '',
+    credit_limit: editItem?.credit_limit ?? '',
     interest_rate: editItem?.interest_rate ?? '',
     min_payment: editItem?.min_payment ?? '',
     type: editItem?.type || 'Credit Card',
@@ -71,7 +74,16 @@ const DebtFormModal = ({ editItem = null, onClose, onSuccess }) => {
     },
     onSuccess: () => { onSuccess(); onClose(); },
   });
-  const handleSubmit = (e) => { e.preventDefault(); mutation.mutate({ ...form, balance: parseFloat(form.balance), interest_rate: parseFloat(form.interest_rate), min_payment: parseFloat(form.min_payment) }); };
+  const handleSubmit = (e) => { 
+    e.preventDefault(); 
+    mutation.mutate({ 
+      ...form, 
+      balance: parseFloat(form.balance), 
+      credit_limit: form.credit_limit ? parseFloat(form.credit_limit) : null,
+      interest_rate: parseFloat(form.interest_rate), 
+      min_payment: parseFloat(form.min_payment) 
+    }); 
+  };
 
   return (
     <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md z-[200] flex items-center justify-center p-4">
@@ -81,16 +93,37 @@ const DebtFormModal = ({ editItem = null, onClose, onSuccess }) => {
           <button onClick={onClose} className="text-slate-300 hover:text-rose-600 transition-all"><X size={20}/></button>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-6 italic">
-          <input required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Identifier"
-            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none uppercase tracking-wider focus:bg-white transition-all"/>
-          <div className="grid grid-cols-2 gap-4">
-            <input required type="number" step="0.01" value={form.balance} onChange={e => setForm(p => ({ ...p, balance: e.target.value }))} placeholder="Balance"
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none text-rose-600 focus:bg-white transition-all"/>
-            <input required type="number" step="0.1" value={form.interest_rate} onChange={e => setForm(p => ({ ...p, interest_rate: e.target.value }))} placeholder="APR %"
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none focus:bg-white transition-all"/>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest leading-none">Target Identifier</label>
+            <input required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. HNB Master, Commercial Visa"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none uppercase tracking-wider focus:bg-white transition-all"/>
           </div>
-          <button type="submit" className="w-full py-5 bg-slate-950 text-white rounded-xl font-black uppercase tracking-[0.3em] text-[10px] hover:bg-rose-600 transition-all">
-            {mutation.isPending ? 'DEPLOYING...' : 'LOCK TARGET NODE'}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+               <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest leading-none">Current Balance</label>
+               <input required type="number" step="0.01" value={form.balance} onChange={e => setForm(p => ({ ...p, balance: e.target.value }))} placeholder="Balance"
+                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none text-rose-600 focus:bg-white transition-all"/>
+            </div>
+            <div className="space-y-2">
+               <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest leading-none">Credit Limit (Optional)</label>
+               <input type="number" step="0.01" value={form.credit_limit} onChange={e => setForm(p => ({ ...p, credit_limit: e.target.value }))} placeholder="Max Limit"
+                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none text-blue-600 focus:bg-white transition-all"/>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+               <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest leading-none">APR %</label>
+               <input required type="number" step="0.1" value={form.interest_rate} onChange={e => setForm(p => ({ ...p, interest_rate: e.target.value }))} placeholder="APR"
+                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none focus:bg-white transition-all"/>
+            </div>
+            <div className="space-y-2">
+               <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest leading-none">Min Payment</label>
+               <input required type="number" step="0.01" value={form.min_payment} onChange={e => setForm(p => ({ ...p, min_payment: e.target.value }))} placeholder="Min"
+                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none focus:bg-white transition-all"/>
+            </div>
+          </div>
+          <button type="submit" className="w-full py-5 bg-slate-950 text-white rounded-xl font-black uppercase tracking-[0.3em] text-[10px] hover:bg-rose-600 transition-all shadow-2xl">
+            {mutation.isPending ? 'DEPLOYING...' : (isEdit ? 'SYNCHRONIZE_CHANGES' : 'LOCK TARGET NODE')}
           </button>
         </form>
       </div>
@@ -128,14 +161,14 @@ const Debt = () => {
   );
 
   return (
-    <div className="space-y-12 pb-32">
+    <div className="space-y-12 pb-32 italic">
       <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10 px-6">
         <div className="space-y-4">
           <div className="flex items-center gap-4 mb-2">
              <span className="bg-rose-600 text-white text-[8px] font-black uppercase tracking-[0.4em] px-3 py-1.5 rounded-full italic">Sniper: Core</span>
              <span className="text-slate-300 text-[9px] font-black uppercase tracking-[0.4em] opacity-40 ml-2 tracking-[0.6em] italic">Active Perimeter Scan</span>
           </div>
-          <h1 className="text-3xl lg:text-4xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Debt Sniper</h1>
+          <h1 className="text-4xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Debt Sniper</h1>
           <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 italic ml-1 leading-none">High-Precision target neutralization.</p>
         </div>
         <button onClick={() => setFormModal({ open: true, editItem: null })}
@@ -147,17 +180,23 @@ const Debt = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 px-6">
          <div className="bg-slate-950 rounded-[2.5rem] p-10 shadow-3xl border border-white/5 relative overflow-hidden group min-h-[220px] flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-rose-600/10 rounded-full blur-[80px] pointer-events-none group-hover:scale-150 transition-all duration-[4000ms]"></div>
-            <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.4em] italic relative z-10">Combined Exposure Delta</p>
+            <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.5em] italic relative z-10">Combined Exposure Delta</p>
             <p className="text-3xl lg:text-4xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(activeTargets.reduce((s,d)=>s+d.balance, 0))}</p>
             <span className="text-[8px] font-black uppercase tracking-[0.5em] text-white/20 italic relative z-10 leading-none">Threat Level: NOMINAL</span>
          </div>
          <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-xl transition-all h-[220px]">
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 italic leading-none">Target Phase Alpha</p>
-            <p className="text-3xl font-black text-slate-950 tracking-tighter uppercase mb-2 italic overflow-hidden text-ellipsis whitespace-nowrap">{activeTargets[0]?.name || 'Clear'}</p>
+             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4 italic leading-none">Tactical Purchasing Power</p>
+             <div>
+                <p className="text-4xl font-black text-blue-600 tracking-tighter italic mb-2">
+                   {formatCurrency(activeTargets.filter(d => d.credit_limit > 0).reduce((s,d) => s + (d.credit_limit - d.balance), 0))}
+                </p>
+                <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] leading-none italic">Remaining Liquidity Capacity</p>
+             </div>
          </div>
          <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-xl transition-all h-[220px]">
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 italic leading-none">Monthly Outbound Trace</p>
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4 italic leading-none">Monthly Outbound Trace</p>
             <p className="text-3xl font-black text-rose-600 tracking-tighter italic">{formatCurrency(activeTargets.reduce((s,d)=>s+d.min_payment,0))}</p>
+            <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] leading-none italic">Minimum Commitment Alpha</span>
          </div>
       </div>
 
@@ -167,32 +206,53 @@ const Debt = () => {
             <thead className="bg-slate-50 border-b border-slate-100 uppercase font-black text-[9px] text-slate-400">
               <tr>
                 <th className="px-10 py-6 text-left tracking-[0.4em]">Target</th>
+                <th className="px-10 py-6 text-right tracking-[0.4em]">Utilization</th>
                 <th className="px-10 py-6 text-right tracking-[0.4em]">APR Scan</th>
                 <th className="px-10 py-6 text-right tracking-[0.4em]">Exit Value</th>
                 <th className="px-10 py-6"/>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {activeTargets.map(debt => (
-                <tr key={debt.id} className="hover:bg-slate-50 group transition-all">
-                  <td className="px-10 py-10">
-                     <p className="font-black text-slate-950 text-2xl tracking-tighter uppercase leading-none group-hover:text-rose-600 transition-colors mb-1">{debt.name}</p>
-                     <span className="text-[9px] font-black text-slate-300 tracking-widest uppercase">{debt.type}</span>
-                  </td>
-                  <td className="px-10 py-10 text-right font-black text-rose-600 text-3xl tracking-tighter">{debt.interest_rate}%</td>
-                  <td className="px-10 py-10 text-right font-black text-slate-950 text-2xl lg:text-4xl tracking-tighter">{formatCurrency(debt.balance)}</td>
-                  <td className="px-10 py-10 text-right">
-                     <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                      <button onClick={() => setPaymentModal({ open: true, debt })} className="px-6 py-4 bg-slate-950 text-white rounded-2xl shadow-xl flex items-center gap-3 text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">
-                         <DollarSign size={14}/> Log Pay
-                      </button>
-                      <button onClick={() => setFormModal({ open: true, editItem: debt })} className="p-3 text-slate-200 hover:text-blue-600 transition-colors"><Pencil size={20}/></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {activeTargets.map(debt => {
+                const utilization = debt.credit_limit > 0 ? (debt.balance / debt.credit_limit) * 100 : 0;
+                return (
+                  <tr key={debt.id} className="hover:bg-slate-50 group transition-all">
+                    <td className="px-10 py-10">
+                       <p className="font-black text-slate-950 text-2xl tracking-tighter uppercase leading-none group-hover:text-rose-600 transition-colors mb-2 uppercase">{debt.name}</p>
+                       <div className="flex items-center gap-3">
+                          <span className="text-[9px] font-black text-slate-400 tracking-widest uppercase italic">{debt.type}</span>
+                          {debt.credit_limit > 0 && <span className="text-[8px] font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase tracking-widest">Limit: {formatCurrency(debt.credit_limit)}</span>}
+                       </div>
+                    </td>
+                    <td className="px-10 py-10 text-right">
+                       {debt.credit_limit > 0 ? (
+                         <div className="flex flex-col items-end gap-2">
+                           <p className={`text-xl font-black italic tracking-tighter ${utilization > 80 ? 'text-rose-600' : utilization > 50 ? 'text-amber-500' : 'text-blue-500'}`}>
+                             {utilization.toFixed(1)}%
+                           </p>
+                           <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
+                             <div className={`h-full transition-all duration-1000 ${utilization > 80 ? 'bg-rose-600' : 'bg-blue-500'}`} style={{ width: `${Math.min(utilization, 100)}%` }}></div>
+                           </div>
+                         </div>
+                       ) : (
+                         <span className="text-[9px] font-black text-slate-200 uppercase tracking-widest italic">N/A</span>
+                       )}
+                    </td>
+                    <td className="px-10 py-10 text-right font-black text-rose-600 text-3xl tracking-tighter italic">{debt.interest_rate}%</td>
+                    <td className="px-10 py-10 text-right font-black text-slate-950 text-2xl lg:text-4xl tracking-tighter italic">{formatCurrency(debt.balance)}</td>
+                    <td className="px-10 py-10 text-right">
+                       <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onClick={() => setPaymentModal({ open: true, debt })} className="px-6 py-4 bg-slate-950 text-white rounded-2xl shadow-xl flex items-center gap-3 text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all italic">
+                           <DollarSign size={14}/> Log Pay
+                        </button>
+                        <button onClick={() => setFormModal({ open: true, editItem: debt })} className="p-3 text-slate-200 hover:text-blue-600 transition-colors"><Pencil size={20}/></button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
               {activeTargets.length === 0 && (
-                <tr><td colSpan="4" className="py-20 text-center font-black text-slate-300 uppercase tracking-widest italic opacity-60">No Targets Identified in Current Perimeter.</td></tr>
+                <tr><td colSpan="5" className="py-20 text-center font-black text-slate-300 uppercase tracking-widest italic opacity-60">No Targets Identified in Current Perimeter.</td></tr>
               )}
             </tbody>
           </table>
@@ -208,12 +268,12 @@ const Debt = () => {
                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><Zap size={18}/></div>
             </div>
             <div className="p-8 space-y-4 max-h-[500px] overflow-y-auto">
-               {allPayments.map((p, idx) => (
+               {allPayments.length > 0 ? allPayments.map((p, idx) => (
                  <div key={idx} className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] hover:bg-emerald-50 transition-all border border-slate-100/50 group/row">
                     <div className="flex items-center gap-6">
                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-slate-100"><DollarSign size={24}/></div>
                        <div>
-                          <p className="font-black text-slate-950 text-lg tracking-tighter uppercase leading-none mb-1">{p.debtName}</p>
+                          <p className="font-black text-slate-950 text-lg tracking-tighter uppercase leading-none mb-1 uppercase">{p.debtName}</p>
                           <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
                              <Calendar size={12}/> {new Date(p.payment_date).toLocaleDateString()}
                           </div>
@@ -224,10 +284,12 @@ const Debt = () => {
                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic opacity-40">VERIFIED</span>
                     </div>
                  </div>
-               ))}
+               )) : (
+                 <div className="py-20 text-center opacity-20 uppercase font-black text-[10px] tracking-[0.5em]">No validated payments recorded</div>
+               )}
             </div>
          </div>
-         <div className="bg-slate-950 rounded-[3rem] p-12 text-white border border-white/5 flex flex-col justify-between group overflow-hidden relative shadow-3xl h-full">
+         <div className="bg-slate-950 rounded-[3rem] p-12 text-white border border-white/5 flex flex-col justify-between group overflow-hidden relative shadow-3xl h-full italic">
             <div className="absolute top-[-100px] right-[-100px] w-96 h-96 bg-rose-600/5 rounded-full blur-[100px] group-hover:scale-110 transition-all duration-[5000ms] pointer-events-none"></div>
             <div className="space-y-8 relative z-10">
                <div className="space-y-4">
@@ -246,7 +308,7 @@ const Debt = () => {
                   <ChevronRight size={28} className="opacity-20 group-hover/btn:translate-x-2 transition-all" />
                </button>
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[1em] text-white/20 text-center mt-16 italic">System Integrity Verified 2.7.0</p>
+            <p className="text-[10px] font-black uppercase tracking-[1em] text-white/20 text-center mt-16 italic opacity-20">System Integrity Verified 2.8.5</p>
          </div>
       </div>
 

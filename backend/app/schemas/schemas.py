@@ -45,6 +45,7 @@ class ExpenseBase(BaseModel):
     amount: float
     category: str
     account: Optional[str] = None
+    linked_card_id: Optional[int] = None
 
 class ExpenseCreate(ExpenseBase):
     pass

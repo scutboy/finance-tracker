@@ -60,9 +60,11 @@ class Expense(Base):
     amount = Column(Float, nullable=False)
     category = Column(String, nullable=False)
     account = Column(String)
+    linked_card_id = Column(Integer, ForeignKey("debts.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     owner = relationship("User")
+    linked_card = relationship("Debt")
 
 class Income(Base):
     __tablename__ = "income"

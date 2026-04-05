@@ -46,6 +46,16 @@ def create_expense(
     current_user: models.User = Depends(get_current_user)
 ):
     new_expense = models.Expense(**expense_in.dict(), user_id=current_user.id)
+    
+    # Automated Flux: If linked to a credit card/debt node, increase the balance
+    if expense_in.linked_card_id:
+        debt = db.query(models.Debt).filter(
+            models.Debt.id == expense_in.linked_card_id,
+            models.Debt.user_id == current_user.id
+        ).first()
+        if debt:
+            debt.balance += expense_in.amount
+            
     db.add(new_expense)
     db.commit()
     db.refresh(new_expense)

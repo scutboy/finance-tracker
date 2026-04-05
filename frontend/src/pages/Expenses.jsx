@@ -19,7 +19,8 @@ import {
   History,
   Info,
   ChevronRight,
-  PieChart as PieIcon
+  PieChart as PieIcon,
+  CreditCard
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format, parseISO } from 'date-fns';
@@ -31,7 +32,7 @@ const CATEGORIES = [
   'Healthcare', 'Shopping', 'Education', 'Insurance', 'Other'
 ];
 
-const ExpenseFormModal = ({ editItem = null, onClose, onSuccess }) => {
+const ExpenseFormModal = ({ editItem = null, onClose, onSuccess, debts = [] }) => {
   const isEdit = !!editItem;
   const today = new Date().toISOString().split('T')[0];
   const [form, setForm] = useState({
@@ -40,6 +41,7 @@ const ExpenseFormModal = ({ editItem = null, onClose, onSuccess }) => {
     amount: editItem?.amount ?? '',
     category: editItem?.category || 'Groceries',
     account: editItem?.account || '',
+    linked_card_id: editItem?.linked_card_id || '',
   });
   const [error, setError] = useState('');
 
@@ -56,7 +58,11 @@ const ExpenseFormModal = ({ editItem = null, onClose, onSuccess }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate({ ...form, amount: parseFloat(form.amount) });
+    mutation.mutate({ 
+      ...form, 
+      amount: parseFloat(form.amount),
+      linked_card_id: form.linked_card_id ? parseInt(form.linked_card_id) : null 
+    });
   };
 
   return (
@@ -68,18 +74,47 @@ const ExpenseFormModal = ({ editItem = null, onClose, onSuccess }) => {
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <input required type="date" value={form.date} onChange={e => set('date', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none"/>
-            <input required type="number" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)} placeholder="Amount" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none font-mono"/>
+            <div className="space-y-1">
+               <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest italic">Date Node</label>
+               <input required type="date" value={form.date} onChange={e => set('date', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none uppercase italic"/>
+            </div>
+            <div className="space-y-1">
+               <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest italic">Loss Rs.</label>
+               <input required type="number" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)} placeholder="0.00" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none font-mono text-rose-600"/>
+            </div>
           </div>
-          <input required value={form.description} onChange={e => set('description', e.target.value)} placeholder="Description" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none italic"/>
+          
+          <div className="space-y-1">
+            <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest italic">Narrative Identification</label>
+            <input required value={form.description} onChange={e => set('description', e.target.value)} placeholder="Netflix, Groceries, AWS..." className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none italic uppercase tracking-tighter"/>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
-            <select required value={form.category} onChange={e => set('category', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-black uppercase outline-none">
-              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-            </select>
-            <input value={form.account} onChange={e => set('account', e.target.value)} placeholder="Source" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none uppercase italic tracking-widest"/>
+            <div className="space-y-1">
+               <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest italic">Sector</label>
+               <select required value={form.category} onChange={e => set('category', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[10px] font-black uppercase outline-none appearance-none cursor-pointer">
+                 {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+               </select>
+            </div>
+            <div className="space-y-1">
+               <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest italic">Source Origin</label>
+               <input value={form.account} onChange={e => set('account', e.target.value)} placeholder="CASH, WALLET..." className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[10px] font-black outline-none uppercase italic tracking-widest"/>
+            </div>
           </div>
-          <button type="submit" className="w-full py-4 bg-slate-950 text-white rounded-xl font-black uppercase tracking-widest text-[10px] italic hover:bg-rose-600 transition-all">
-            {mutation.isPending ? 'Syncing...' : 'Lock Exit Node'}
+
+          <div className="space-y-1">
+             <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest italic">Linked Leverage Node (Auto-Update Balance)</label>
+             <select value={form.linked_card_id} onChange={e => set('linked_card_id', e.target.value)}
+               className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[10px] font-black uppercase outline-none appearance-none cursor-pointer text-blue-600">
+               <option value="">LIQUID_EXIT (No Card)</option>
+               {debts.filter(d => d.type === 'Credit Card').map(d => (
+                 <option key={d.id} value={d.id}>{d.name} (Bal: {formatCurrency(d.balance)})</option>
+               ))}
+             </select>
+          </div>
+
+          <button type="submit" className="w-full py-5 bg-slate-950 text-white rounded-xl font-black uppercase tracking-[0.4em] text-[10px] italic hover:bg-rose-600 transition-all shadow-xl shadow-slate-950/20">
+            {mutation.isPending ? 'Syncing...' : (isEdit ? 'INITIALIZE_REFINE' : 'LOCK EXIT NODE')}
           </button>
         </form>
       </div>
@@ -195,21 +230,28 @@ const Expenses = () => {
     },
   });
 
+  const { data: debts } = useQuery({
+    queryKey: ['debts'],
+    queryFn: async () => (await api.get('/debts/')).data,
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id) => api.delete(`/expenses/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey:['expenses'] });
       queryClient.invalidateQueries({ queryKey:['dashboardSummary'] });
+      queryClient.invalidateQueries({ queryKey:['debts'] });
     },
   });
 
   const handleSuccess = () => {
     queryClient.invalidateQueries({ queryKey:['expenses'] });
     queryClient.invalidateQueries({ queryKey:['dashboardSummary'] });
+    queryClient.invalidateQueries({ queryKey:['debts'] });
   };
 
   return (
-    <div className="space-y-12 pb-32 max-w-7xl mx-auto">
+    <div className="space-y-12 pb-32 max-w-7xl mx-auto italic">
       <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10 px-6">
         <div className="space-y-4">
           <div className="flex items-center gap-4 mb-2">
@@ -300,7 +342,7 @@ const Expenses = () => {
               <tr className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] italic">
                 <th className="px-8 py-6 text-left">Timestamp</th>
                 <th className="px-8 py-6 text-left">Narrative</th>
-                <th className="px-8 py-6 text-left">Sector</th>
+                <th className="px-8 py-6 text-left">Sector / Origin</th>
                 <th className="px-8 py-6 text-right">Flux Loss</th>
                 <th className="px-8 py-6 w-32"/>
               </tr>
@@ -313,10 +355,17 @@ const Expenses = () => {
                   <tr key={expense.id} className="hover:bg-slate-50 group transition-all">
                     <td className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] font-mono italic">{format(parseISO(expense.date), 'dd/MM/yy')}</td>
                     <td className="px-8 py-6">
-                       <p className="font-black text-slate-950 text-xl tracking-tighter uppercase italic leading-none group-hover:text-blue-600 transition-colors">{expense.description}</p>
+                       <p className="font-black text-slate-950 text-xl tracking-tighter uppercase italic leading-none group-hover:text-blue-600 transition-colors uppercase">{expense.description}</p>
                     </td>
                     <td className="px-8 py-6">
-                       <span className="text-[8px] font-black bg-slate-950 text-white px-3 py-1 rounded-full uppercase tracking-[0.2em] italic">{expense.category}</span>
+                       <div className="flex flex-col gap-2">
+                          <span className="text-[8px] w-fit font-black bg-slate-950 text-white px-3 py-1 rounded-full uppercase tracking-[0.2em] italic">{expense.category}</span>
+                          {expense.linked_card_id && (
+                            <span className="text-[8px] w-fit font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase tracking-[0.2em] italic flex items-center gap-2">
+                               <CreditCard size={10}/> {debts?.find(d => d.id === expense.linked_card_id)?.name || 'Linked Card'}
+                            </span>
+                          )}
+                       </div>
                     </td>
                     <td className="px-8 py-6 text-right">
                        <p className="font-black text-rose-600 text-2xl italic tracking-tighter">{formatCurrency(expense.amount)}</p>
@@ -334,7 +383,7 @@ const Expenses = () => {
           </table>
         </div>
       </div>
-      {formModal.open && <ExpenseFormModal editItem={formModal.editItem} onClose={() => setFormModal({ open: false, editItem: null })} onSuccess={handleSuccess} />}
+      {formModal.open && <ExpenseFormModal debts={debts || []} editItem={formModal.editItem} onClose={() => setFormModal({ open: false, editItem: null })} onSuccess={handleSuccess} />}
       {uploadModalOpen && <UploadModal onClose={() => setUploadModalOpen(false)} onSuccess={handleSuccess}/>}
     </div>
   );
