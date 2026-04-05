@@ -159,15 +159,20 @@ def get_dashboard_summary(
             "date": str(i.date)
         })
         
-    # Sort and slice
-    recent_txns = sorted(recent_txns, key=lambda x: x['date'], reverse=True)[:4]
+    # Sort and slice safely
+    try:
+        recent_txns = sorted(recent_txns, key=lambda x: str(x.get('date', '0000-01-01')), reverse=True)[:4]
+    except Exception:
+        recent_txns = recent_txns[:4]
 
     return {
         "net_worth": round(net_worth, 2),
         "total_debt": round(total_debt, 2),
         "total_saved": round(total_saved, 2),
-        "total_expenses": round(current_month_expenses, 2), # Key used by frontend
-        "total_income": round(current_month_income, 2),   # Key used by frontend
+        "total_expenses": round(current_month_expenses, 2),
+        "total_income": round(current_month_income, 2),
+        "monthly_expenses": round(current_month_expenses, 2), # Legacy key fallback
+        "monthly_income": round(current_month_income, 2),   # Legacy key fallback
         "net_cash_flow": round(net_cash_flow, 2),
         "hourly_leakage": round(total_hourly_leakage, 4),
         "cash_flow": cash_flow,

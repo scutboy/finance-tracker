@@ -89,9 +89,10 @@ const Dashboard = () => {
   const { user } = useAuth();
   const firstName = user?.name?.split(' ')[0] || 'Member';
 
-  const { data: summary, isLoading } = useQuery({
+  const { data: summary, isLoading, isError, error: queryError } = useQuery({
     queryKey: ['dashboardSummary'],
     queryFn: async () => (await api.get('/dashboard/summary')).data,
+    retry: 1, // Minimize retry spam for Charith
   });
 
   const healthStatus = useMemo(() => {
@@ -116,6 +117,18 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-12 lg:space-y-16 pb-40 italic">
+      {isError && (
+        <div className="mx-6 p-10 bg-rose-950 text-rose-500 rounded-[2.5rem] border border-rose-500/20 shadow-2xl animate-pulse">
+           <div className="flex items-center gap-6 mb-4">
+              <ShieldAlert size={32} />
+              <h2 className="text-2xl font-black uppercase italic tracking-tighter">Systemic Intelligence Failure</h2>
+           </div>
+           <p className="text-[11px] font-black uppercase tracking-[0.4em] opacity-60 mb-6 italic">The Vantage core encountered a critical anomaly during flux synchronization.</p>
+           <code className="text-[10px] bg-white/5 p-4 rounded-xl block border border-white/5 opacity-40">{queryError?.message || 'Handshake Protocol Timed Out'}</code>
+           <button onClick={() => window.location.reload()} className="mt-8 px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-black uppercase text-[9px] tracking-widest transition-all">Re-Launch Intelligence Node</button>
+        </div>
+      )}
+
       {/* ── Dynamic Command Header ────────────────────────────────────── */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
         <div className="space-y-4">

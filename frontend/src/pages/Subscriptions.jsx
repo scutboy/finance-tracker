@@ -49,7 +49,7 @@ const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) 
     mutation.mutate({
       ...form,
       amount: parseFloat(form.amount),
-      billing_day: parseInt(form.billing_day),
+      billing_day: parseInt(form.billing_day || 1),
       linked_card_id: form.linked_card_id ? parseInt(form.linked_card_id) : null
     });
   };
@@ -71,7 +71,7 @@ const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) 
           </div>
           
           <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
+            <div className="space-y-2 col-span-2">
                <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-[0.2em]">Amount Node</label>
                <div className="relative">
                   <input required type="number" step="0.01" value={form.amount} onChange={e => setForm(p=>({...p, amount: e.target.value}))} placeholder="0.00"
@@ -82,6 +82,15 @@ const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) 
                   </button>
                </div>
             </div>
+            
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-[0.2em]">Sector Node</label>
+              <select value={form.category} onChange={e => setForm(p=>({...p, category: e.target.value}))}
+                className="w-full bg-slate-50 border border-slate-100 rounded-xl px-6 py-4 text-sm font-black outline-none tracking-widest focus:bg-white transition-all uppercase appearance-none cursor-pointer">
+                {['Entertainment', 'Utilities', 'Software/SaaS', 'Finance', 'Lifestyle', 'Other'].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            
             <div className="space-y-2">
                <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-[0.2em]">Billing Day</label>
                <input required type="number" min="1" max="31" value={form.billing_day} onChange={e => setForm(p=>({...p, billing_day: e.target.value}))}
