@@ -96,8 +96,13 @@ const Dashboard = () => {
 
   const healthStatus = useMemo(() => {
     if (!summary) return { label: 'SYNCHRONIZING...', color: 'text-slate-400', icon: Activity, bg: 'bg-slate-100' };
-    const debtRatio = summary.total_debt / (summary.monthly_income || 1);
-    const flowRatio = summary.monthly_expenses / (summary.monthly_income || 1);
+    const income = summary.total_income || summary.monthly_income || 1;
+    const expenses = summary.total_expenses || summary.monthly_expenses || 0;
+    const debt = summary.total_debt || 0;
+    
+    const debtRatio = debt / income;
+    const flowRatio = expenses / income;
+    
     if (debtRatio > 12 || flowRatio > 0.95) return { label: 'CRITICAL_LEAKAGE', color: 'text-rose-600', icon: ShieldAlert, bg: 'bg-rose-50' };
     if (debtRatio > 6) return { label: 'DEBT_SATURATION', color: 'text-amber-600', icon: AlertTriangle, bg: 'bg-amber-50' };
     if (summary.net_worth < 0) return { label: 'NET_NEGATIVE_EQUITY', color: 'text-rose-500', icon: Target, bg: 'bg-rose-50' };

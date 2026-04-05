@@ -31,9 +31,11 @@ const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
   const isEdit = !!editItem;
   const [form, setForm] = useState({
     name: editItem?.name || '',
-    target: editItem?.target ?? '',
-    current: editItem?.current ?? '',
-    type: editItem?.type || 'Emergency Fund',
+    target_amount: editItem?.target_amount ?? '',
+    current_amount: editItem?.current_amount ?? '',
+    category: editItem?.category || 'Emergency Fund',
+    monthly_contribution: editItem?.monthly_contribution ?? 0,
+    target_date: editItem?.target_date || new Date().toISOString().split('T')[0],
   });
   const [error, setError] = useState('');
 
@@ -50,8 +52,9 @@ const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
     e.preventDefault();
     const payload = {
       ...form,
-      target: parseFloat(form.target),
-      current: parseFloat(form.current),
+      target_amount: parseFloat(form.target_amount),
+      current_amount: parseFloat(form.current_amount),
+      monthly_contribution: parseFloat(form.monthly_contribution || 0),
     };
     mutation.mutate(payload);
   };
@@ -69,12 +72,12 @@ const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
             <input required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Goal Name"
               className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-950 outline-none italic uppercase tracking-wider"/>
             <div className="grid grid-cols-2 gap-4">
-              <input required type="number" value={form.current} onChange={e => setForm(p => ({ ...p, current: e.target.value }))} placeholder="Current"
+              <input required type="number" value={form.current_amount} onChange={e => setForm(p => ({ ...p, current_amount: e.target.value }))} placeholder="Current"
                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-950 outline-none italic"/>
-              <input required type="number" value={form.target} onChange={e => setForm(p => ({ ...p, target: e.target.value }))} placeholder="Target"
+              <input required type="number" value={form.target_amount} onChange={e => setForm(p => ({ ...p, target_amount: e.target.value }))} placeholder="Target"
                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-950 outline-none italic"/>
             </div>
-            <select required value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
+            <select required value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
               className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-black text-slate-950 outline-none uppercase italic">
               {GOAL_TYPES.map(t => <option key={t}>{t}</option>)}
             </select>
@@ -106,11 +109,11 @@ const Savings = () => {
     },
   });
 
-  const totalSaved = goals?.reduce((s, g) => s + g.current, 0) || 0;
-  const totalTarget = goals?.reduce((s, g) => s + g.target, 0) || 1;
+  const totalSaved = goals?.reduce((s, g) => s + g.current_amount, 0) || 0;
+  const totalTarget = goals?.reduce((s, g) => s + g.target_amount, 0) || 1;
   const aggregateProgress = Math.min((totalSaved / totalTarget) * 100, 100);
 
-  const pieData = goals?.map(g => ({ name: g.name, value: g.current })) || [];
+  const pieData = goals?.map(g => ({ name: g.name, value: g.current_amount })) || [];
 
   return (
     <div className="space-y-12 pb-32 max-w-7xl mx-auto">
@@ -164,7 +167,7 @@ const Savings = () => {
                            <div className="w-3 h-3 rounded-full" style={{ background: COLORS[i % COLORS.length] }}></div>
                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">{g.name}</p>
                         </div>
-                        <p className="text-[10px] font-black text-slate-950 italic">{totalSaved > 0 ? ((g.current / totalSaved) * 100).toFixed(1) : '0.0'}%</p>
+                        <p className="text-[10px] font-black text-slate-950 italic">{totalSaved > 0 ? ((g.current_amount / totalSaved) * 100).toFixed(1) : '0.0'}%</p>
                      </div>
                    ))}
                 </div>
@@ -179,13 +182,13 @@ const Savings = () => {
           <div className="md:col-span-2 text-center py-40 border-4 border-slate-50 rounded-[4rem] italic font-black text-slate-300 uppercase tracking-[0.5em]">No Nodes Found</div>
         ) : (
           goals.map((goal, i) => {
-            const pct = Math.min((goal.current / goal.target) * 100, 100);
+            const pct = Math.min((goal.current_amount / goal.target_amount) * 100, 100);
             return (
               <div key={goal.id} className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-100 group hover:shadow-2xl transition-all relative overflow-hidden flex flex-col min-h-[380px]">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <p className="text-xl font-black text-slate-950 tracking-tighter italic leading-none mb-2">{goal.name}</p>
-                    <span className="text-[8px] font-black bg-slate-950 text-white px-3 py-1 rounded-full uppercase italic">{goal.type}</span>
+                    <span className="text-[8px] font-black bg-slate-950 text-white px-3 py-1 rounded-full uppercase italic">{goal.category}</span>
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => setFormModal({ open: true, editItem: goal })} className="p-2 text-slate-300 hover:text-blue-600"><Sparkles size={16}/></button>
@@ -197,11 +200,11 @@ const Savings = () => {
                   <div className="flex justify-between items-end">
                     <div>
                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1 italic">Locked</p>
-                      <p className="text-2xl font-black text-slate-950 italic">{formatCurrency(goal.current)}</p>
+                      <p className="text-2xl font-black text-slate-950 italic">{formatCurrency(goal.current_amount)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1 italic">Target</p>
-                      <p className="text-xl font-black text-slate-300 italic">{formatCurrency(goal.target)}</p>
+                      <p className="text-xl font-black text-slate-300 italic">{formatCurrency(goal.target_amount)}</p>
                     </div>
                   </div>
 
@@ -211,7 +214,7 @@ const Savings = () => {
                     </div>
                     <div className="flex justify-between">
                       <p className="text-[9px] font-black text-slate-400 uppercase italic">{pct.toFixed(1)}%</p>
-                      <p className="text-[9px] font-black text-slate-400 uppercase italic">Gap: {formatCurrency(Math.max(0, goal.target - goal.current))}</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase italic">Gap: {formatCurrency(Math.max(0, goal.target_amount - goal.current_amount))}</p>
                     </div>
                   </div>
                 </div>

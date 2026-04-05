@@ -14,11 +14,12 @@ import {
   TrendingDown,
   RefreshCw,
   Search,
-  DollarSign
+  DollarSign,
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const USD_TO_LKR = 300; // Static conversion for Hiruni's request
+const USD_TO_LKR = 300; 
 
 const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) => {
   const [form, setForm] = useState({
@@ -30,18 +31,20 @@ const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) 
     status: editItem?.status || 'active',
     currency: editItem?.currency || 'LKR'
   });
+  const [error, setError] = useState('');
   
   const mutation = useMutation({
     mutationFn: async (data) => {
       if (editItem) return (await api.put(`/subscriptions/${editItem.id}`, data)).data;
       return (await api.post('/subscriptions/', data)).data;
     },
-    onSuccess: () => { onSuccess(); onClose(); }
+    onSuccess: () => { onSuccess(); onClose(); },
+    onError: (e) => setError(e.response?.data?.detail || 'Handshake Error.')
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.name || !form.amount) return;
+    setError('');
     
     mutation.mutate({
       ...form,
@@ -59,10 +62,12 @@ const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) 
           <button onClick={onClose} className="text-slate-300 hover:text-blue-600 transition-all"><X size={20}/></button>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-6 italic">
+          {error && <div className="p-4 bg-rose-50 text-rose-600 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3"><AlertCircle size={16}/> {error}</div>}
+          
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-[0.2em]">Service Identification</label>
             <input required value={form.name} onChange={e => setForm(p=>({...p, name: e.target.value}))} placeholder="Netflix, AWS, Rent, etc."
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none tracking-widest focus:bg-white transition-all uppercase"/>
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-6 py-4 text-sm font-black outline-none tracking-widest focus:bg-white transition-all uppercase"/>
           </div>
           
           <div className="grid grid-cols-2 gap-6">
@@ -70,9 +75,9 @@ const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) 
                <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-[0.2em]">Amount Node</label>
                <div className="relative">
                   <input required type="number" step="0.01" value={form.amount} onChange={e => setForm(p=>({...p, amount: e.target.value}))} placeholder="0.00"
-                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none text-blue-600 focus:bg-white transition-all"/>
+                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-6 py-4 text-sm font-black outline-none text-blue-600 focus:bg-white transition-all"/>
                   <button type="button" onClick={() => setForm(p => ({ ...p, currency: p.currency === 'LKR' ? 'USD' : 'LKR' }))}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-slate-950 text-white px-3 py-1 rounded-lg text-[9px] font-black hover:bg-blue-600 transition-all">
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-slate-950 text-white px-3 py-1.5 rounded-lg text-[9px] font-black hover:bg-blue-600 transition-all shadow-xl">
                     {form.currency}
                   </button>
                </div>
@@ -80,14 +85,14 @@ const SubscriptionModal = ({ editItem = null, onClose, onSuccess, cards = [] }) 
             <div className="space-y-2">
                <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-[0.2em]">Billing Day</label>
                <input required type="number" min="1" max="31" value={form.billing_day} onChange={e => setForm(p=>({...p, billing_day: e.target.value}))}
-                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none focus:bg-white transition-all"/>
+                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-6 py-4 text-sm font-black outline-none focus:bg-white transition-all"/>
             </div>
           </div>
 
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-[0.2em]">Linked Card Node (Optional)</label>
             <select value={form.linked_card_id} onChange={e => setForm(p=>({...p, linked_card_id: e.target.value}))}
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-4 text-sm font-black outline-none focus:bg-white transition-all uppercase tracking-widest appearance-none cursor-pointer">
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-6 py-4 text-sm font-black outline-none focus:bg-white transition-all uppercase tracking-widest appearance-none cursor-pointer">
               <option value="">DECOUPLED_STATUS</option>
               {cards.map(c => <option key={c.id} value={c.id}>{c.name} ({c.type})</option>)}
             </select>
@@ -124,7 +129,7 @@ const Subscriptions = () => {
   const totalMonthlyLKR = useMemo(() => {
     return subs?.reduce((s, b) => {
       const amt = b.currency === 'USD' ? b.amount * USD_TO_LKR : b.amount;
-      return s + amt;
+      return s + (b.status === 'active' ? amt : 0);
     }, 0) || 0;
   }, [subs]);
 
@@ -176,7 +181,7 @@ const Subscriptions = () => {
              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4 italic leading-none">Active USD Leech Factor</p>
              <div>
                 <p className="text-4xl font-black text-slate-950 tracking-tighter italic mb-2">
-                   ${subs?.filter(b => b.currency === 'USD').reduce((s, b) => s + b.amount, 0).toFixed(2)} 
+                   ${subs?.filter(b => b.currency === 'USD' && b.status === 'active').reduce((s, b) => s + b.amount, 0).toFixed(2)} 
                    <span className="text-xs text-slate-300 ml-2">USD/MO</span>
                 </p>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-40 leading-relaxed italic">Converted to base LKR automatically in global sum.</p>
@@ -198,7 +203,7 @@ const Subscriptions = () => {
                        <span className="flex items-center gap-2"><Calendar size={14}/> Cycle {sub.billing_day}</span>
                        <span className="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-full"><RefreshCw size={12}/> Periodic</span>
                        {sub.linked_card_id && (
-                         <span className="flex items-center gap-2 text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                         <span className="flex items-center gap-3 text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
                            <CreditCard size={12}/> 
                            {cards?.find(c => c.id === sub.linked_card_id)?.name || 'Linked Card'}
                          </span>
@@ -226,7 +231,7 @@ const Subscriptions = () => {
                     <button onClick={() => setModal({ open: true, editItem: sub })} className="p-4 text-slate-300 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 rounded-2xl transition-all">
                        <Pencil size={20}/>
                     </button>
-                    <button onClick={() => deleteMutation.mutate(sub.id)} className="p-4 text-slate-300 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 rounded-2xl transition-all">
+                    <button onClick={() => { if(window.confirm('Delete trace?')) deleteMutation.mutate(sub.id); }} className="p-4 text-slate-300 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 rounded-2xl transition-all">
                        <Trash2 size={20}/>
                     </button>
                  </div>
@@ -236,7 +241,7 @@ const Subscriptions = () => {
 
          {subs?.length === 0 && (
            <div className="py-24 bg-slate-50/50 rounded-[4rem] border-2 border-dashed border-slate-100 flex flex-col items-center justify-center gap-8 opacity-60">
-              <div className="p-8 bg-white rounded-[2rem] shadow-sm"><DollarSign size={60} className="text-slate-200" /></div>
+              <div className="p-8 bg-white rounded-[2rem] shadow-sm"><TrendingDown size={60} className="text-slate-200" /></div>
               <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.8em] italic">System Void: No Recurring Traces.</p>
            </div>
          )}

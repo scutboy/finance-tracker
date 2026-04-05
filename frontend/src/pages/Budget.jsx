@@ -101,7 +101,7 @@ const Budget = () => {
   const overallUsage = Math.min((totalSpent / (totalBudgeted || 1)) * 100, 100);
 
   return (
-    <div className="space-y-12 pb-32 max-w-7xl mx-auto">
+    <div className="space-y-12 pb-32 max-w-7xl mx-auto italic">
       <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10 px-6">
         <div className="space-y-4">
           <div className="flex items-center gap-4 mb-2">
@@ -117,17 +117,16 @@ const Budget = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 px-6">
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 px-6">
-         <div className="xl:col-span-2 bg-slate-950 rounded-[2.5rem] p-10 shadow-3xl border border-white/5 relative overflow-hidden group min-h-[300px] flex flex-col justify-between">
+         <div className="xl:col-span-2 bg-slate-950 rounded-[2.5rem] p-10 shadow-3xl border border-white/5 relative overflow-hidden group min-h-[320px] flex flex-col justify-between">
             <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none group-hover:scale-150 transition-all duration-[4000ms]"></div>
             <div className="relative z-10">
-               <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] mb-4 italic leading-none">Intelligence Hub: Tactical Guidance</p>
+               <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] mb-4 italic leading-none">Intelligence Hub: Tactical Guidance</p>
                <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-6">How Budget Guard Operates</h3>
                <div className="space-y-4">
-                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80 decoration-blue-500/30 underline-offset-4 decoration-dotted">1. Define Sector Caps: establish monthly limits for core expense categories.</p>
+                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80">1. Define Sector Caps: establish monthly limits for core expense categories.</p>
                   <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80">2. Live Burn Rate: the system automatically tracks real-time expenditure against these caps.</p>
-                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80">3. Exposure Warning: bars turn <span className="text-rose-500 font-black underline">ROSE</span> when a cap is breached, flagging a systemic deficit node.</p>
+                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80">3. Exposure Warning: bars turn <span className="text-rose-500 font-black">ROSE</span> when a cap is breached.</p>
                </div>
             </div>
             <div className="relative z-10 flex items-center justify-between pt-8 border-t border-white/5 mt-8">
@@ -138,36 +137,35 @@ const Budget = () => {
 
          <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-2xl transition-all h-full">
-               <div className="space-y-2">
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic mb-4 leading-none">Consolidated Cap</p>
-                  <p className="text-4xl font-black text-slate-950 tracking-tighter italic">{formatCurrency(totalBudgeted)}</p>
-               </div>
-               <div className="pt-6 border-t border-slate-50 mt-4 flex items-center justify-between">
-                  <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic opacity-60">Status: PERSISTENT</span>
-                  <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+               <div className="space-y-6">
+                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none">Aggregate Allocation Cap</p>
+                  <p className="text-5xl font-black text-slate-950 tracking-tighter italic">{formatCurrency(totalBudgeted)}</p>
+                  <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
+                     <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic opacity-60">Status: PERSISTENT</span>
+                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                  </div>
                </div>
             </div>
             <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-2xl transition-all h-full">
                <div className="space-y-6">
                   <div className="flex justify-between items-start">
                      <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none">Absorption Delta</p>
-                     <p className="text-2xl font-black text-emerald-600 tracking-tighter italic">{overallUsage.toFixed(1)}%</p>
+                     <p className="text-3xl font-black text-emerald-600 tracking-tighter italic">{overallUsage.toFixed(1)}%</p>
                   </div>
-                  <div className="w-full bg-slate-50 h-3 rounded-full overflow-hidden">
-                     <div className="h-full bg-emerald-500 transition-all duration-1000" style={{ width: `${overallUsage}%` }}></div>
+                  <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden p-1 border border-slate-50">
+                     <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${overallUsage}%` }}></div>
                   </div>
-                  <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic opacity-40">System suggesting node adjustment if delta exceeds 85%.</p>
+                  <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic opacity-40">System suggests adjustment if delta exceeds 85%.</p>
                </div>
             </div>
          </div>
-      </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-6">
         {isLoading ? (
           [1,2,3].map(i => <div key={i} className="h-80 bg-white rounded-[2rem] animate-pulse"/>)
         ) : budgets?.length === 0 ? (
-          <div className="lg:col-span-3 text-center py-40 bg-white rounded-[2rem] border-4 border-dotted border-slate-50 italic font-black text-slate-300 uppercase tracking-[0.5em]">No Constraints Active</div>
+          <div className="lg:col-span-3 text-center py-40 bg-slate-50/50 rounded-[4rem] border-4 border-slate-100 border-dashed italic font-black text-slate-300 uppercase tracking-[0.5em]">No Constraints Active</div>
         ) : (
           budgets.map(budget => {
             const spent = budget.total_spent || 0;
@@ -176,15 +174,15 @@ const Budget = () => {
             const isOver = pct >= 100;
 
             return (
-              <div key={budget.id} className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-100 group hover:shadow-2xl transition-all relative overflow-hidden flex flex-col justify-between min-h-[400px]">
+              <div key={budget.id} className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-100 group hover:shadow-3xl transition-all relative overflow-hidden flex flex-col justify-between min-h-[400px]">
                 <div className="flex justify-between items-start mb-8 relative z-10">
                    <div>
                      <h3 className="text-2xl font-black text-slate-950 tracking-tighter italic uppercase truncate mb-1">{budget.category}</h3>
                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] italic">Node: Verified</p>
                    </div>
                    <div className="flex gap-2">
-                      <button onClick={() => setFormModal({ open: true, editItem: budget })} className="text-slate-300 hover:text-blue-600"><Sparkles size={16}/></button>
-                      <button onClick={() => { if(window.confirm('Delete?')) deleteMutation.mutate(budget.id); }} className="text-slate-300 hover:text-rose-600"><Trash2 size={16}/></button>
+                      <button onClick={() => setFormModal({ open: true, editItem: budget })} className="p-2 text-slate-300 hover:text-blue-600"><Sparkles size={16}/></button>
+                      <button onClick={() => { if(window.confirm('Delete?')) deleteMutation.mutate(budget.id); }} className="p-2 text-slate-300 hover:text-rose-600"><Trash2 size={16}/></button>
                    </div>
                 </div>
 
@@ -200,8 +198,8 @@ const Budget = () => {
                    </div>
 
                    <div className="space-y-4">
-                      <div className="w-full bg-slate-100 rounded-full h-8 p-1 overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-1000 ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{ width: `${pct}%` }}></div>
+                      <div className="w-full bg-slate-100 rounded-full h-8 p-1 overflow-hidden border border-slate-50">
+                        <div className={`h-full rounded-full transition-all duration-1000 ${isOver ? 'bg-rose-500 shadow-rose-500/50' : 'bg-emerald-500 shadow-emerald-500/50 shadow-lg'}`} style={{ width: `${pct}%` }}></div>
                       </div>
                       <div className="flex justify-between">
                         <p className="text-[9px] font-black text-slate-400 uppercase italic">Burn: {formatCurrency(spent)}</p>
