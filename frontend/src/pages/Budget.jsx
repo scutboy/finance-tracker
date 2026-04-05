@@ -118,28 +118,49 @@ const Budget = () => {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 px-6">
-         <div className="bg-slate-950 rounded-[2rem] p-10 shadow-2xl border border-white/5 relative overflow-hidden group min-h-[220px] flex flex-col justify-between">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/10 rounded-full blur-[80px] pointer-events-none group-hover:scale-150 transition-all duration-[4000ms]"></div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic relative z-10">Consolidated Allocation Cap</p>
-            <p className="text-4xl font-black text-white tracking-tighter italic relative z-10">{formatCurrency(totalBudgeted)}</p>
-            <span className="text-[8px] font-black uppercase tracking-[0.8em] text-white/10 italic">METRIC_AUDIT_STABLE</span>
-         </div>
-
-         <div className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-xl transition-all">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic mb-4 leading-none">Cycle Inbound Flux</p>
-            <div>
-               <p className="text-2xl font-black text-slate-950 tracking-tight italic uppercase leading-none mb-2">{formatCurrency(totalSpent)}</p>
-               <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-slate-950 text-white px-3 py-1 rounded-full italic">{overallUsage.toFixed(1)}% Usage</span>
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 px-6">
+         <div className="xl:col-span-2 bg-slate-950 rounded-[2.5rem] p-10 shadow-3xl border border-white/5 relative overflow-hidden group min-h-[300px] flex flex-col justify-between">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none group-hover:scale-150 transition-all duration-[4000ms]"></div>
+            <div className="relative z-10">
+               <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] mb-4 italic leading-none">Intelligence Hub: Tactical Guidance</p>
+               <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-6">How Budget Guard Operates</h3>
+               <div className="space-y-4">
+                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80 decoration-blue-500/30 underline-offset-4 decoration-dotted">1. Define Sector Caps: establish monthly limits for core expense categories.</p>
+                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80">2. Live Burn Rate: the system automatically tracks real-time expenditure against these caps.</p>
+                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-80">3. Exposure Warning: bars turn <span className="text-rose-500 font-black underline">ROSE</span> when a cap is breached, flagging a systemic deficit node.</p>
+               </div>
+            </div>
+            <div className="relative z-10 flex items-center justify-between pt-8 border-t border-white/5 mt-8">
+               <span className="text-[9px] font-black uppercase tracking-[0.6em] text-white/20 italic">VANTAGE_GUARD_v2.5</span>
+               <div className="p-3 bg-white/5 rounded-xl text-blue-500 animate-pulse"><ShieldAlert size={20}/></div>
             </div>
          </div>
 
-         <div className="bg-white rounded-[2rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-xl transition-all">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic mb-4 leading-none">Delta Trace</p>
-            <div>
-               <p className="text-2xl font-black text-emerald-600 tracking-tighter italic uppercase leading-none mb-2">{formatCurrency(totalBudgeted - totalSpent)}</p>
-               <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] italic">Surplus Capacity</span>
+         <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-2xl transition-all h-full">
+               <div className="space-y-2">
+                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic mb-4 leading-none">Consolidated Cap</p>
+                  <p className="text-4xl font-black text-slate-950 tracking-tighter italic">{formatCurrency(totalBudgeted)}</p>
+               </div>
+               <div className="pt-6 border-t border-slate-50 mt-4 flex items-center justify-between">
+                  <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic opacity-60">Status: PERSISTENT</span>
+                  <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+               </div>
+            </div>
+            <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 flex flex-col justify-between group hover:shadow-2xl transition-all h-full">
+               <div className="space-y-6">
+                  <div className="flex justify-between items-start">
+                     <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none">Absorption Delta</p>
+                     <p className="text-2xl font-black text-emerald-600 tracking-tighter italic">{overallUsage.toFixed(1)}%</p>
+                  </div>
+                  <div className="w-full bg-slate-50 h-3 rounded-full overflow-hidden">
+                     <div className="h-full bg-emerald-500 transition-all duration-1000" style={{ width: `${overallUsage}%` }}></div>
+                  </div>
+                  <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic opacity-40">System suggesting node adjustment if delta exceeds 85%.</p>
+               </div>
             </div>
          </div>
+      </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-6">

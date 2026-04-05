@@ -24,7 +24,7 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 
-const GOAL_TYPES = ['Emergency Fund', "Son's Future", 'Retirement', 'Investment', 'Other'];
+const GOAL_TYPES = ['Emergency Fund', 'Child Education', 'Retirement', 'Property', 'Vehicle', 'Travel', 'Investment', 'Other'];
 const COLORS = ['#2563eb', '#10b981', '#7c3aed', '#f59e0b', '#ef4444'];
 
 const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
@@ -39,8 +39,8 @@ const GoalFormModal = ({ editItem = null, onClose, onSuccess }) => {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      if (isEdit) return (await api.put(`/savings/${editItem.id}`, data)).data;
-      return (await api.post('/savings/', data)).data;
+      if (isEdit) return (await api.put(`/goals/${editItem.id}`, data)).data;
+      return (await api.post('/goals/', data)).data;
     },
     onSuccess: () => { onSuccess(); onClose(); },
     onError: (e) => setError(e.response?.data?.detail || 'Sync Error.'),
@@ -95,11 +95,11 @@ const Savings = () => {
 
   const { data: goals, isLoading } = useQuery({
     queryKey: ['savings'],
-    queryFn: async () => (await api.get('/savings/')).data,
+    queryFn: async () => (await api.get('/goals/')).data,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id) => api.delete(`/savings/${id}`),
+    mutationFn: async (id) => api.delete(`/goals/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['savings'] });
       queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });

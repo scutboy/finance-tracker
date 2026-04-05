@@ -110,25 +110,70 @@ def get_dashboard_summary(
         hourly_rate = (d.interest_rate / 100) / 365 / 24
         total_hourly_leakage += d.balance * hourly_rate
 
+    # ── Subscriptions ────────────────────────────────────────────────────────
+    subs = db.query(models.Subscription).filter(
+        models.Subscription.user_id == current_user.id,
+        models.Subscription.status == 'active'
+    ).all()
+    
+    total_sub_monthly = 0.0
+    USD_TO_LKR_RATE = 300.0  # Constant as requested
+    
+    for s in subs:
+        amt = s.amount
+        if s.currency == 'USD':
+            amt *= USD_TO_LKR_RATE
+        total_sub_monthly += amt
+
+    # Add subscription costs to current month expenses for a more accurate "Leakage" view
+    current_month_expenses += total_sub_monthly
+
     # ── Recent Income entries (last 5) ────────────────────────────────────────
     recent_income = db.query(models.Income).filter(
         models.Income.user_id == current_user.id
     ).order_by(models.Income.date.desc()).limit(5).all()
 
+    # Get recent transactions (both income and expenses) for the Flux Trace
+    recent_txns = []
+    
+    # Get last 4 expenses
+    recent_expenses = db.query(models.Expense).filter(
+        models.Expense.user_id == current_user.id
+    ).order_by(models.Expense.date.desc()).limit(4).all()
+    
+    for e in recent_expenses:
+        recent_txns.append({
+            "type": "expense",
+            "description": e.description,
+            "amount": e.amount,
+            "category": e.category,
+            "date": str(e.date)
+        })
+        
+    for i in recent_income:
+        recent_txns.append({
+            "type": "income",
+            "description": i.description,
+            "amount": i.amount,
+            "category": i.category,
+            "date": str(i.date)
+        })
+        
+    # Sort and slice
+    recent_txns = sorted(recent_txns, key=lambda x: x['date'], reverse=True)[:4]
+
     return {
         "net_worth": round(net_worth, 2),
         "total_debt": round(total_debt, 2),
         "total_saved": round(total_saved, 2),
-        "monthly_expenses": round(current_month_expenses, 2),
-        "monthly_income": round(current_month_income, 2),
+        "total_expenses": round(current_month_expenses, 2), # Key used by frontend
+        "total_income": round(current_month_income, 2),   # Key used by frontend
         "net_cash_flow": round(net_cash_flow, 2),
         "hourly_leakage": round(total_hourly_leakage, 4),
         "cash_flow": cash_flow,
         "savings_progress": savings_progress,
         "debt_breakdown": debt_breakdown,
         "target_debt": target_debt,
-        "recent_income": [
-            {"description": i.description, "amount": i.amount, "category": i.category, "date": str(i.date)}
-            for i in recent_income
-        ],
+        "recent_transactions": recent_txns,
+        "total_subscriptions": round(total_sub_monthly, 2)
     }

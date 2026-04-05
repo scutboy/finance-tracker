@@ -16,13 +16,15 @@ import {
   Pencil, 
   TrendingDown, 
   ArrowDownRight,
-  ShieldCheck,
-  Zap,
-  Activity,
   History,
-  Info
+  Info,
+  ChevronRight,
+  PieChart as PieIcon
 } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format, parseISO } from 'date-fns';
+
+const COLORS = ['#2563eb', '#10b981', '#7c3aed', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4', '#8b5cf6', '#64748b'];
 
 const CATEGORIES = [
   'Groceries', 'Dining & Entertainment', 'Transport', 'Utilities',
@@ -228,6 +230,55 @@ const Expenses = () => {
           </button>
         </div>
       </div>
+
+      {!isLoading && expenses?.length > 0 && (
+        <div className="mx-6 p-10 bg-white rounded-[3rem] border border-slate-100 shadow-sm flex flex-col lg:flex-row items-center gap-16 group hover:shadow-2xl transition-all duration-700">
+           <div className="h-72 w-full lg:w-[400px] relative">
+              <ResponsiveContainer width="100%" height="100%">
+                 <PieChart>
+                    <Pie data={Object.entries(expenses.reduce((acc, e) => { acc[e.category] = (acc[e.category] || 0) + e.amount; return acc; }, {})).map(([name, value]) => ({ name, value }))} 
+                        cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={8} dataKey="value" stroke="none">
+                       {CATEGORIES.map((_, i) => <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip content={({ active, payload }) => {
+                       if (active && payload && payload.length) {
+                          return (
+                             <div className="bg-slate-950 text-white p-5 rounded-2xl shadow-2xl border border-white/10 italic">
+                                <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2">{payload[0].name}</p>
+                                <p className="text-2xl font-black tracking-tighter">{formatCurrency(payload[0].value)}</p>
+                             </div>
+                          );
+                       }
+                       return null;
+                    }}/>
+                 </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                 <div className="text-center">
+                    <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-300 italic">Sector</p>
+                    <p className="text-[8px] font-black text-blue-600 uppercase tracking-widest">Analysis</p>
+                 </div>
+              </div>
+           </div>
+           <div className="flex-1 space-y-6 w-full">
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-950 flex items-center gap-4"><PieIcon size={24} className="text-blue-500"/> Sector distribution</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                 {Object.entries(expenses.reduce((acc, e) => { acc[e.category] = (acc[e.category] || 0) + e.amount; return acc; }, {}))
+                   .sort((a,b) => b[1] - a[1])
+                   .slice(0, 6)
+                   .map(([cat, amt], i) => (
+                    <div key={cat} className="space-y-1">
+                       <div className="flex items-center gap-3">
+                          <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }}></div>
+                          <p className="text-[10px] font-black text-slate-950 uppercase tracking-tighter italic truncate">{cat}</p>
+                       </div>
+                       <p className="text-lg font-black text-slate-400 italic leading-none">{formatCurrency(amt)}</p>
+                    </div>
+                 ))}
+              </div>
+           </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 px-6">
         <div className="xl:col-span-3">

@@ -158,6 +158,7 @@ class Subscription(Base):
     category = Column(String)
     linked_card_id = Column(Integer, ForeignKey("debts.id"), nullable=True)
     status = Column(String, default="active") # active, cancelled, paused
+    currency = Column(String, default="LKR")
     created_at = Column(DateTime, default=datetime.utcnow)
 
     owner = relationship("User")

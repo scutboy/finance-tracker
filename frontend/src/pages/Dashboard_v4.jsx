@@ -20,7 +20,8 @@ import {
   AlertTriangle,
   ShieldAlert,
   Flame,
-  LifeBuoy
+  LifeBuoy,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -161,12 +162,39 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {isLoading ? [1,2,3].map(i => <div key={i} className="h-[180px] bg-white border border-slate-100 rounded-[2rem] animate-pulse"/>) : (
           <>
-            <MetricCard title="Consolidated Inbound" amount={summary?.monthly_income || 0} subtitle="Cycle Fluidity" icon={TrendingUp} colorClass="text-emerald-500" gradientClass="bg-emerald-50" />
-            <MetricCard title="Allocated Leakage" amount={summary?.monthly_expenses || 0} subtitle="Consumption Index" icon={TrendingDown} colorClass="text-rose-500" gradientClass="bg-rose-50" />
+            <MetricCard title="Consolidated Inbound" amount={summary?.total_income || summary?.monthly_income || 0} subtitle="Cycle Fluidity" icon={TrendingUp} colorClass="text-emerald-500" gradientClass="bg-emerald-50" />
+            <MetricCard title="Allocated Leakage" amount={summary?.total_expenses || summary?.monthly_expenses || 0} subtitle="Consumption Index" icon={TrendingDown} colorClass="text-rose-500" gradientClass="bg-rose-50" />
             <MetricCard title="Capital Momentum" amount={summary?.net_cash_flow || 0} subtitle="Surge Retention" icon={Zap} colorClass="text-amber-500" gradientClass="bg-amber-50" />
           </>
         )}
       </div>
+
+      {/* ── Subscription Leakage Analytics (New) ────────────────────────── */}
+      {summary?.total_subscriptions > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+           <div className="lg:col-span-3 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-sm flex flex-col lg:flex-row items-center gap-12 group hover:shadow-2xl transition-all duration-700">
+              <div className="p-6 bg-slate-950 text-white rounded-[2rem] flex items-center justify-center shrink-0 shadow-2xl group-hover:rotate-12 transition-all">
+                 <RefreshCw size={32} className="animate-spin-slow" />
+              </div>
+              <div className="flex-1 space-y-2">
+                 <div className="flex items-center gap-4">
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em] italic">Recurring Leakage Pulse</span>
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                 </div>
+                 <h3 className="text-2xl font-black text-slate-950 tracking-tighter italic uppercase">Subscription Overhead</h3>
+                 <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide leading-relaxed italic opacity-60">The system has identified {formatCurrency(summary.total_subscriptions)} in monthly recurring leakage, including multi-currency USD nodes converted at 300 LKR/USD.</p>
+              </div>
+              <div className="text-right shrink-0">
+                 <p className="text-4xl font-black text-slate-950 tracking-tighter italic">{formatCurrency(summary.total_subscriptions)}</p>
+                 <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em] mt-2 italic leading-none">Monthly Systemic Drain</p>
+              </div>
+           </div>
+           <div className="bg-slate-50 rounded-[2rem] p-10 border border-slate-100 flex flex-col justify-center items-center text-center gap-4 hover:bg-blue-50/50 transition-all cursor-pointer" onClick={() => window.location.href='/subscriptions'}>
+              <p className="text-[9px] font-black text-blue-600 uppercase tracking-[0.5em] italic">Manage Nodes</p>
+              <ChevronRight size={24} className="text-slate-200" />
+           </div>
+        </div>
+      )}
 
       {/* ── System Integrity Layer ────────────────────────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
@@ -211,16 +239,16 @@ const Dashboard = () => {
                </div>
                <div className="p-3 lg:p-4 bg-slate-50 rounded-2xl text-slate-300 group-hover:text-blue-500 transition-all"><History size={24} /></div>
             </div>
-            <div className="space-y-6 flex-1">
+             <div className="space-y-6 flex-1">
                {isLoading ? [1,2,3,4].map(i => <div key={i} className="h-16 bg-slate-50 rounded-[1.5rem] animate-pulse"/>) : (
-                  summary?.recent_income?.slice(0, 4).map((txn, idx) => (
+                  summary?.recent_transactions?.map((txn, idx) => (
                     <div key={idx} className="flex items-center justify-between p-4 hover:bg-slate-50 rounded-[1.5rem] transition-all duration-500 group/row cursor-default border border-transparent hover:border-slate-100">
                         <div className="flex items-center gap-5">
                            <div className={`p-2 lg:p-3 rounded-xl shadow-sm ${txn.type === 'income' ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
-                              {txn.type === 'income' ? <ArrowUpRight size={16}/> : <ArrowDownRight size={16}/>}
+                              {txn.type === 'income' ? <ArrowUpRight size={16}/> : <ArrowDownRight size={22}/>}
                            </div>
                            <div>
-                              <p className="text-md lg:text-lg font-black text-slate-950 tracking-tighter uppercase leading-none mb-1 group-hover/row:text-blue-600 transition-colors italic">{txn.description}</p>
+                              <p className="text-md lg:text-lg font-black text-slate-950 tracking-tighter uppercase leading-none mb-1 group/row:text-blue-600 transition-colors italic">{txn.description}</p>
                               <p className="text-[8px] lg:text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] leading-none italic">{txn.date}</p>
                            </div>
                         </div>
@@ -228,7 +256,9 @@ const Dashboard = () => {
                           {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount)}
                         </p>
                     </div>
-                  ))
+                  )) || (
+                    <div className="flex flex-col items-center justify-center py-20 opacity-20 italic font-black uppercase tracking-widest text-[10px]">No recent flux anomalies recorded</div>
+                  )
                )}
             </div>
             <button className="mt-8 py-5 w-full bg-slate-50 hover:bg-slate-100 rounded-[1.5rem] text-[8px] lg:text-[9px] font-black text-slate-400 uppercase tracking-[0.5em] transition-all flex items-center justify-center gap-4 italic leading-none">

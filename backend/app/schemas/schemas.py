@@ -154,6 +154,7 @@ class SubscriptionBase(BaseModel):
     category: Optional[str] = None
     linked_card_id: Optional[int] = None
     status: str = "active"
+    currency: str = "LKR"
 
 class SubscriptionCreate(SubscriptionBase):
     pass
