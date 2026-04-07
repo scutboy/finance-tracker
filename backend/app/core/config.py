@@ -10,14 +10,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
     # Use Any to let us handle parsing manually in __init__
-    ALLOWED_ORIGINS: Any = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-        "https://finance-tracker-gamma-black.vercel.app",
-        "https://vantage-finance.vercel.app"
-    ]
+    ALLOWED_ORIGINS: Any = ["*"] # Global wildcard to fix Charith's Network Errors
 
     class Config:
         case_sensitive = True

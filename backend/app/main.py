@@ -4,26 +4,28 @@ from app.core.config import settings
 from app.api import api_router
 from app.db.database import engine, Base
 from app.db import models
+from sqlalchemy import text
 
 # Ensure all tables exist in the current persistence layer node
 Base.metadata.create_all(bind=engine)
 
-# Auto-Repair: Direct Schema Migrations for SQLite without Alembic
-from sqlalchemy import text
-with engine.connect() as conn:
-    try: conn.execute(text("ALTER TABLE expenses ADD COLUMN linked_card_id INTEGER REFERENCES debts(id)"))
-    except Exception: pass
-    try: conn.execute(text("ALTER TABLE subscriptions ADD COLUMN currency TEXT DEFAULT 'LKR'"))
-    except Exception: pass
-    try: conn.execute(text("ALTER TABLE debts ADD COLUMN credit_limit FLOAT"))
-    except Exception: pass
-    try: conn.execute(text("ALTER TABLE savings_goals ADD COLUMN category TEXT DEFAULT 'Emergency Fund'"))
-    except Exception: pass
-    try: conn.execute(text("ALTER TABLE savings_goals ADD COLUMN target_date DATE"))
-    except Exception: pass
-    try: conn.execute(text("ALTER TABLE savings_goals ADD COLUMN monthly_contribution FLOAT DEFAULT 0.0"))
-    except Exception: pass
-    conn.commit()
+# Auto-Repair Transactional Block: Direct Schema Migrations for SQLite
+def run_migration(sql_stmt):
+    with engine.connect() as conn:
+        try:
+            conn.execute(text(sql_stmt))
+            conn.commit()
+        except Exception:
+            # We catch exceptions to prevent startup crashes if column exists
+            pass
+
+# Execute tactical repairs on startup
+run_migration("ALTER TABLE expenses ADD COLUMN linked_card_id INTEGER REFERENCES debts(id)")
+run_migration("ALTER TABLE subscriptions ADD COLUMN currency TEXT DEFAULT 'LKR'")
+run_migration("ALTER TABLE debts ADD COLUMN credit_limit FLOAT")
+run_migration("ALTER TABLE savings_goals ADD COLUMN category TEXT DEFAULT 'Emergency Fund'")
+run_migration("ALTER TABLE savings_goals ADD COLUMN target_date DATE")
+run_migration("ALTER TABLE savings_goals ADD COLUMN monthly_contribution FLOAT DEFAULT 0.0")
 
 print("--- VANTAGE COMMAND SYSTEM INITIALIZED ---")
 app = FastAPI(title=settings.PROJECT_NAME)
@@ -44,4 +46,4 @@ def read_root():
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "operational", "version": "v4.3.8", "signature": "Charith's Finance Tracker"}
+    return {"status": "operational", "version": "v4.3.11", "signature": "Charith's Vantage Command"}
