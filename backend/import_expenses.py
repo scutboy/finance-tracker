@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from app.db.database import SessionLocal
 from app.db.models import User, Expense, Subscription, Debt
-import math
+import os
 
 def parse_date(date_str):
     if pd.isna(date_str):
@@ -11,7 +11,6 @@ def parse_date(date_str):
     try:
         if isinstance(date_str, datetime):
             return date_str.date()
-        # Parse DD/MM/YY
         return datetime.strptime(date_str.strip(), "%d/%m/%y").date()
     except Exception as e:
         print(f"Error parsing date {date_str}: {e}")
@@ -24,11 +23,18 @@ def main():
         print("User not found.")
         return
         
-    df = pd.read_excel('../Bank_Transactions_Feb-Apr_2026.xlsx', skiprows=1)
+    excel_path = '../Bank_Transactions_Feb-Apr_2026.xlsx'
+    if not os.path.exists(excel_path):
+        excel_path = 'Bank_Transactions_Feb-Apr_2026.xlsx'
+        
+    if not os.path.exists(excel_path):
+        print(f"Excel file not found at {excel_path}")
+        return
+        
+    df = pd.read_excel(excel_path, skiprows=1)
     
-    # Subscriptions keywords
     sub_keywords = {
-        'CLAUDE.AI': ('Claude.ai', 6000),      # Will estimate amount if missing
+        'CLAUDE.AI': ('Claude.ai', 6000),      
         'RUNPOD.IO': ('RunPod', 3000),
         'OPENROUTER': ('OpenRouter', 3000),
         'OBSIDIAN CA': ('Obsidian', 1500),
@@ -40,9 +46,6 @@ def main():
         'GEFORCE NOW': ('GeForce Now', 0)
     }
     
-    new_expenses_count = 0
-    new_subscriptions_count = 0
-
     debit_transactions = df[df['Txn Type'] == 'Debit']
     
     for idx, row in debit_transactions.iterrows():
@@ -77,7 +80,6 @@ def main():
         elif "book" in merchant.lower() or "ielts" in merchant.lower():
             category = "Education"
         
-        # Check if expense already exists
         exists = db.query(Expense).filter(
             Expense.user_id == user.id,
             Expense.date == date_val,
@@ -86,12 +88,13 @@ def main():
         ).first()
         
         if not exists:
-            # see if we can link to a debt/credit card
             linked_card_id = None
             if "credit card" in account.lower():
                 card = db.query(Debt).filter(Debt.user_id == user.id, Debt.type == 'Credit Card', Debt.name.ilike(f"%{row.get('Bank', '')}%")).first()
                 if card:
                     linked_card_id = card.id
+                    # Automatically update card balance
+                    card.balance += amount
             
             new_expense = Expense(
                 user_id=user.id,
@@ -103,13 +106,10 @@ def main():
                 linked_card_id=linked_card_id
             )
             db.add(new_expense)
-            new_expenses_count += 1
             
-        # Check for subscriptions
         upper_merchant = merchant.upper()
         for key, (sub_name, default_amt) in sub_keywords.items():
             if key in upper_merchant:
-                # add to subs if not exists
                 sub_exists = db.query(Subscription).filter(
                     Subscription.user_id == user.id,
                     Subscription.name == sub_name
@@ -125,14 +125,10 @@ def main():
                         currency="LKR"
                     )
                     db.add(new_sub)
-                    new_subscriptions_count += 1
                 break
 
     db.commit()
     db.close()
-    
-    print(f"Added {new_expenses_count} new expenses.")
-    print(f"Added {new_subscriptions_count} new subscriptions.")
 
 if __name__ == '__main__':
     main()
