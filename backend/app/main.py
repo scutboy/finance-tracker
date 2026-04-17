@@ -27,22 +27,6 @@ run_migration("ALTER TABLE savings_goals ADD COLUMN category TEXT DEFAULT 'Emerg
 run_migration("ALTER TABLE savings_goals ADD COLUMN target_date DATE")
 run_migration("ALTER TABLE savings_goals ADD COLUMN monthly_contribution FLOAT DEFAULT 0.0")
 
-# --- Automated Ledger Sync on Application Boot ---
-import os
-import subprocess
-try:
-    if not os.path.exists(".import_done"):
-        print("Running automated expense & subscription ingestion for production...")
-        subprocess.run(["python", "import_expenses.py"], cwd=".")
-        # Re-date the dummy data so it does not block dashboard recent transactions
-        with engine.connect() as conn:
-            conn.execute(text("UPDATE income SET date = date('now', '-5 days') WHERE date > date('now')"))
-            conn.commit()
-        with open(".import_done", "w") as f:
-            f.write("done")
-except Exception as e:
-    print(f"Ingestion Sync failed: {e}")
-
 print("--- VANTAGE COMMAND SYSTEM INITIALIZED ---")
 app = FastAPI(title=settings.PROJECT_NAME)
 
