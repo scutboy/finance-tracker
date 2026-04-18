@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 api_router = APIRouter()
 
-from app.api.endpoints import auth, expenses, debts, goals, budget, dashboard, income, subscriptions
+from app.api.endpoints import auth, expenses, debts, goals, budget, dashboard, income, subscriptions, sms_inbox
 
 api_router.include_router(auth.router, prefix="/auth", tags=["Auth"])
 api_router.include_router(expenses.router, prefix="/expenses", tags=["Expenses"])
@@ -12,3 +12,4 @@ api_router.include_router(budget.router, prefix="/budget", tags=["Budget"])
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 api_router.include_router(income.router, prefix="/income", tags=["Income"])
 api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["Subscriptions"])
+api_router.include_router(sms_inbox.router, prefix="/sms", tags=["SMS Inbox"])

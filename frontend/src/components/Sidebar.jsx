@@ -16,7 +16,8 @@ import {
   Zap,
   Activity,
   History,
-  X
+  X,
+  MessageSquare
 } from 'lucide-react';
 
 const Sidebar = ({ mobile = false, onClose }) => {
@@ -26,6 +27,7 @@ const Sidebar = ({ mobile = false, onClose }) => {
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Income Hub', path: '/income', icon: TrendingUp },
     { name: 'Expense Trace', path: '/expenses', icon: Receipt },
+    { name: 'SMS Inbox', path: '/sms-inbox', icon: MessageSquare },
     { name: 'Debt Sniper', path: '/debt', icon: CreditCard },
     { name: 'Debt Advisor', path: '/debt-advisor', icon: Brain },
     { name: 'Subscriptions', path: '/subscriptions', icon: Zap },

@@ -17,6 +17,7 @@ import Settings from './pages/Settings';
 
 import DebtAdvisor from './pages/DebtAdvisor';
 import Subscriptions from './pages/Subscriptions';
+import SMSInbox from './pages/SMSInbox';
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ function App() {
               <Route path="/savings" element={<Savings />} />
               <Route path="/budget" element={<Budget />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/sms-inbox" element={<SMSInbox />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

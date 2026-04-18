@@ -19,9 +19,11 @@ import {
   LifeBuoy,
   RefreshCw,
   Wallet,
-  History
+  History,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const LeakagePulse = ({ hourlyRate }) => {
@@ -125,16 +127,22 @@ const Dashboard = () => {
       )}
 
       {/* ── Header ────────────────────────────────────── */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
         <div className="space-y-3">
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">Cycle: {cycleDates}</p>
-          <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900 leading-none">Good morning, {firstName}</h1>
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-wider italic">Cycle: {cycleDates}</p>
+          <div className="flex items-center gap-6">
+            <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900 leading-none italic uppercase">Good morning, {firstName}</h1>
+            <Link to="/sms-inbox" className="hidden lg:flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 italic">
+                <MessageSquare size={14} />
+                Ingest SMS
+            </Link>
+          </div>
         </div>
         <div className={`flex items-center gap-6 p-6 lg:p-6 ${healthStatus.bg} rounded-3xl min-w-full lg:min-w-[320px] transition-all`}>
            <div className={`p-4 bg-white rounded-full ${healthStatus.color} shadow-sm`}><healthStatus.icon size={28} /></div>
            <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Financial Health</p>
-              <p className={`text-xl font-black tracking-tight ${healthStatus.color}`}>{healthStatus.label}</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 italic">Financial Health</p>
+              <p className={`text-xl font-black tracking-tight ${healthStatus.color} italic`}>{healthStatus.label}</p>
            </div>
         </div>
       </div>
