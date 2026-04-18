@@ -70,7 +70,8 @@ def get_dashboard_summary(
     # ── This Month's Expenses & Income ───────────────────────────────────────
     current_month_expenses = db.query(func.sum(models.Expense.amount)).filter(
         models.Expense.user_id == current_user.id,
-        models.Expense.date >= cycle_start
+        models.Expense.date >= cycle_start,
+        models.Expense.is_transfer == False
     ).scalar() or 0.0
 
     current_month_income = db.query(func.sum(models.Income.amount)).filter(
@@ -90,7 +91,8 @@ def get_dashboard_summary(
         month_expense = db.query(func.sum(models.Expense.amount)).filter(
             models.Expense.user_id == current_user.id,
             models.Expense.date >= start_date,
-            models.Expense.date < end_date
+            models.Expense.date < end_date,
+            models.Expense.is_transfer == False
         ).scalar() or 0.0
 
         month_income = db.query(func.sum(models.Income.amount)).filter(
