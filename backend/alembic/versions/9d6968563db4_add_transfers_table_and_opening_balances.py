@@ -88,7 +88,11 @@ def upgrade() -> None:
                    existing_server_default=sa.text("'LKR'"))
     except Exception as e:
         print(f"Skipping alter column operations locally for sqlite: {e}")
-    op.create_index(op.f('ix_subscriptions_id'), 'subscriptions', ['id'], unique=False)
+        
+    try:
+        op.create_index(op.f('ix_subscriptions_id'), 'subscriptions', ['id'], unique=False)
+    except Exception as e:
+        print(f"Skipping create_index for subscriptions: {e}")
     
     # --- DATA MIGRATION ---
     bind = op.get_bind()
