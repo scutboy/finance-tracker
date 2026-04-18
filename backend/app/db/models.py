@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Date, Enum as SQLAlchemyEnum
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Date, Boolean, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -58,8 +58,9 @@ class Expense(Base):
     date = Column(Date, nullable=False)
     description = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
-    category = Column(String, nullable=False)
-    account = Column(String)
+    category = Column(String, nullable=False, default="other")
+    account = Column(String, nullable=True)
+    is_transfer = Column(Boolean, default=False)
     linked_card_id = Column(Integer, ForeignKey("debts.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -74,7 +75,8 @@ class Income(Base):
     date = Column(Date, nullable=False)
     description = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
-    category = Column(SQLAlchemyEnum(IncomeCategoryEnum), nullable=False, default=IncomeCategoryEnum.salary)
+    category = Column(String, nullable=False, default="salary")
+    account = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     owner = relationship("User")

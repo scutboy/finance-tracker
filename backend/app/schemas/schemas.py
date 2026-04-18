@@ -7,7 +7,8 @@ class IncomeBase(BaseModel):
     date: date
     description: str
     amount: float
-    category: IncomeCategoryEnum = IncomeCategoryEnum.salary
+    category: str = "salary"
+    account: Optional[str] = None
 
 class IncomeCreate(IncomeBase):
     pass
@@ -46,6 +47,7 @@ class ExpenseBase(BaseModel):
     category: str
     account: Optional[str] = None
     linked_card_id: Optional[int] = None
+    is_transfer: bool = False
 
 class ExpenseCreate(ExpenseBase):
     pass
