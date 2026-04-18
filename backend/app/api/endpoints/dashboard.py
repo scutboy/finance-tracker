@@ -191,11 +191,51 @@ def get_dashboard_summary(
             "date": str(i.date)
         })
         
-    # Sort and slice safely
-    try:
-        recent_txns = sorted(recent_txns, key=lambda x: str(x.get('date', '0000-01-01')), reverse=True)[:4]
-    except Exception:
-        recent_txns = recent_txns[:4]
+    # ── Cycle Transactions for Top Level Transparency ─────────────────────────────
+    # Income for this cycle
+    cycle_income_txns = db.query(models.Income).filter(
+        models.Income.user_id == current_user.id,
+        models.Income.date >= cycle_start
+    ).order_by(models.Income.date.desc()).all()
+
+    # Expenses for this cycle
+    cycle_expense_txns = db.query(models.Expense).filter(
+        models.Expense.user_id == current_user.id,
+        models.Expense.date >= cycle_start,
+        models.Expense.is_transfer == False
+    ).order_by(models.Expense.date.desc()).all()
+
+    def serialize_txns(txns, type_label):
+        res = []
+        for t in txns:
+            try:
+                cat = t.category.value if hasattr(t.category, 'value') else str(t.category or 'Other')
+            except Exception:
+                cat = 'Other'
+            res.append({
+                "type": type_label,
+                "description": t.description,
+                "amount": t.amount,
+                "category": cat,
+                "date": str(t.date),
+                "account": getattr(t, "account", None)
+            })
+        return res
+
+    income_list = serialize_txns(cycle_income_txns, "income")
+    expense_list = serialize_txns(cycle_expense_txns, "expense")
+    
+    # We add subscriptions to expense calculation, so let's push them into expense list for transparency
+    for s in subs:
+        amt = s.amount * (USD_TO_LKR_RATE if s.currency == 'USD' else 1.0)
+        expense_list.append({
+            "type": "expense",
+            "description": f"{s.name} (Subscription)",
+            "amount": amt,
+            "category": "Subscriptions",
+            "date": str(now.date()),
+            "account": "Auto-calculated"
+        })
 
     return {
         "net_worth": round(net_worth, 2),
@@ -214,5 +254,7 @@ def get_dashboard_summary(
         "target_debt": target_debt,
         "budget_status": budget_status,
         "recent_transactions": recent_txns,
-        "total_subscriptions": round(total_sub_monthly, 2)
+        "total_subscriptions": round(total_sub_monthly, 2),
+        "cycle_income_transactions": income_list,
+        "cycle_expense_transactions": expense_list
     }

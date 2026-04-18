@@ -146,6 +146,53 @@ const Dashboard = () => {
         <MetricCard title="Net Cash Flow" amount={summary?.net_cash_flow || 0} subtitle="Surplus / Deficit" icon={Wallet} colorClass="text-blue-500" gradientClass="bg-blue-50" />
       </div>
 
+      {/* ── Cycle Analytical Breakdown (Audit Trail) ────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Income Audit */}
+        <div className="bg-white rounded-[2rem] border border-emerald-100 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
+          <div className="bg-emerald-50 p-6 border-b border-emerald-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-100 text-emerald-600 rounded-xl"><TrendingUp size={18}/></div>
+              <h3 className="text-sm font-black text-emerald-950 uppercase tracking-widest leading-none italic">Income Composition</h3>
+            </div>
+            <p className="text-emerald-700 font-black tracking-tighter text-xl italic">{formatCurrency(summary?.total_income || summary?.monthly_income || 0)}</p>
+          </div>
+          <div className="overflow-y-auto p-2">
+            {summary?.cycle_income_transactions?.map((t, idx) => (
+              <div key={idx} className="flex items-center justify-between p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
+                <div>
+                  <p className="text-sm font-bold text-slate-800 leading-tight block">{t.description}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1 block">{t.date} • {t.category}</p>
+                </div>
+                <p className="font-black text-emerald-600 tracking-tight whitespace-nowrap pl-4">+{formatCurrency(t.amount)}</p>
+              </div>
+            )) || <p className="p-8 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic">No income detected this cycle.</p>}
+          </div>
+        </div>
+
+        {/* Expense Audit */}
+        <div className="bg-white rounded-[2rem] border border-rose-100 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
+          <div className="bg-rose-50 p-6 border-b border-rose-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-rose-100 text-rose-600 rounded-xl"><TrendingDown size={18}/></div>
+              <h3 className="text-sm font-black text-rose-950 uppercase tracking-widest leading-none italic">Expense Composition</h3>
+            </div>
+            <p className="text-rose-700 font-black tracking-tighter text-xl italic">{formatCurrency(summary?.total_expenses || summary?.monthly_expenses || 0)}</p>
+          </div>
+          <div className="overflow-y-auto p-2">
+            {summary?.cycle_expense_transactions?.map((t, idx) => (
+              <div key={idx} className="flex items-center justify-between p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
+                <div>
+                  <p className="text-sm font-bold text-slate-800 leading-tight block">{t.description}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1 block">{t.date} • {t.category}</p>
+                </div>
+                <p className="font-black text-rose-600 tracking-tight whitespace-nowrap pl-4">-{formatCurrency(t.amount)}</p>
+              </div>
+            )) || <p className="p-8 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic">No expenses detected this cycle.</p>}
+          </div>
+        </div>
+      </div>
+
       {/* ── Credit Card Balance Strip ─────────────────────────── */}
       {summary?.debt_breakdown?.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
