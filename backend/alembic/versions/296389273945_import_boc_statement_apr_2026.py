@@ -26,7 +26,7 @@ def upgrade() -> None:
                 "amount": 10.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -35,7 +35,7 @@ def upgrade() -> None:
                 "amount": 5025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -44,7 +44,7 @@ def upgrade() -> None:
                 "amount": 200.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -53,7 +53,7 @@ def upgrade() -> None:
                 "amount": 10.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -62,7 +62,7 @@ def upgrade() -> None:
                 "amount": 200.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -71,7 +71,7 @@ def upgrade() -> None:
                 "amount": 10.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -80,7 +80,7 @@ def upgrade() -> None:
                 "amount": 30025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -89,7 +89,7 @@ def upgrade() -> None:
                 "amount": 290000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -98,7 +98,7 @@ def upgrade() -> None:
                 "amount": 20025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -107,7 +107,7 @@ def upgrade() -> None:
                 "amount": 10.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -116,7 +116,7 @@ def upgrade() -> None:
                 "amount": 200.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -125,7 +125,7 @@ def upgrade() -> None:
                 "amount": 40025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -134,7 +134,7 @@ def upgrade() -> None:
                 "amount": 10025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -143,7 +143,7 @@ def upgrade() -> None:
                 "amount": 130000.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -152,7 +152,7 @@ def upgrade() -> None:
                 "amount": 50025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -161,7 +161,7 @@ def upgrade() -> None:
                 "amount": 35025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -170,7 +170,7 @@ def upgrade() -> None:
                 "amount": 2000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -179,7 +179,7 @@ def upgrade() -> None:
                 "amount": 20025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -188,7 +188,7 @@ def upgrade() -> None:
                 "amount": 200000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -197,7 +197,7 @@ def upgrade() -> None:
                 "amount": 15025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -206,7 +206,7 @@ def upgrade() -> None:
                 "amount": 50025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -215,7 +215,7 @@ def upgrade() -> None:
                 "amount": 100000.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -224,7 +224,7 @@ def upgrade() -> None:
                 "amount": 10.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -233,7 +233,7 @@ def upgrade() -> None:
                 "amount": 20025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -242,7 +242,7 @@ def upgrade() -> None:
                 "amount": 125000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -251,7 +251,7 @@ def upgrade() -> None:
                 "amount": 200.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -260,7 +260,7 @@ def upgrade() -> None:
                 "amount": 10000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -269,7 +269,7 @@ def upgrade() -> None:
                 "amount": 4000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -278,7 +278,7 @@ def upgrade() -> None:
                 "amount": 2000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -287,7 +287,7 @@ def upgrade() -> None:
                 "amount": 10000.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -296,7 +296,7 @@ def upgrade() -> None:
                 "amount": 15025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -305,7 +305,7 @@ def upgrade() -> None:
                 "amount": 10025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -314,7 +314,7 @@ def upgrade() -> None:
                 "amount": 55025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -323,7 +323,7 @@ def upgrade() -> None:
                 "amount": 10.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -332,7 +332,7 @@ def upgrade() -> None:
                 "amount": 43025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -341,7 +341,7 @@ def upgrade() -> None:
                 "amount": 15025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -350,7 +350,7 @@ def upgrade() -> None:
                 "amount": 20025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -359,7 +359,7 @@ def upgrade() -> None:
                 "amount": 30000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -368,7 +368,7 @@ def upgrade() -> None:
                 "amount": 45025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -377,7 +377,7 @@ def upgrade() -> None:
                 "amount": 50000.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -386,7 +386,7 @@ def upgrade() -> None:
                 "amount": 50025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -395,7 +395,7 @@ def upgrade() -> None:
                 "amount": 1500.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -404,7 +404,7 @@ def upgrade() -> None:
                 "amount": 10025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -413,7 +413,7 @@ def upgrade() -> None:
                 "amount": 10000.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -422,7 +422,7 @@ def upgrade() -> None:
                 "amount": 10025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -431,7 +431,7 @@ def upgrade() -> None:
                 "amount": 10025.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -440,7 +440,7 @@ def upgrade() -> None:
                 "amount": 50.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -449,7 +449,7 @@ def upgrade() -> None:
                 "amount": 4025.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -458,7 +458,7 @@ def upgrade() -> None:
                 "amount": 30000.0,
                 "category": "Transfer",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         }
 ]
     
@@ -477,7 +477,7 @@ def upgrade() -> None:
                 "amount": 256304.43,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -486,7 +486,7 @@ def upgrade() -> None:
                 "amount": 50000.0,
                 "category": "other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -495,7 +495,7 @@ def upgrade() -> None:
                 "amount": 262214.12,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -504,7 +504,7 @@ def upgrade() -> None:
                 "amount": 125000.0,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -513,7 +513,7 @@ def upgrade() -> None:
                 "amount": 200000.0,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -522,7 +522,7 @@ def upgrade() -> None:
                 "amount": 262094.45,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -531,7 +531,7 @@ def upgrade() -> None:
                 "amount": 3899.8,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -540,7 +540,7 @@ def upgrade() -> None:
                 "amount": 290000.0,
                 "category": "other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -549,7 +549,7 @@ def upgrade() -> None:
                 "amount": 175044.93,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -558,7 +558,7 @@ def upgrade() -> None:
                 "amount": 30000.0,
                 "category": "salary",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -567,7 +567,7 @@ def upgrade() -> None:
                 "amount": 30000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -576,7 +576,7 @@ def upgrade() -> None:
                 "amount": 175044.93,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -585,7 +585,7 @@ def upgrade() -> None:
                 "amount": 290000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -594,7 +594,7 @@ def upgrade() -> None:
                 "amount": 3899.8,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -603,7 +603,7 @@ def upgrade() -> None:
                 "amount": 262094.45,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -612,7 +612,7 @@ def upgrade() -> None:
                 "amount": 200000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": true
+                "is_transfer": True
         },
         {
                 "user_id": 1,
@@ -621,7 +621,7 @@ def upgrade() -> None:
                 "amount": 125000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -630,7 +630,7 @@ def upgrade() -> None:
                 "amount": 262214.12,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -639,7 +639,7 @@ def upgrade() -> None:
                 "amount": 50000.0,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         },
         {
                 "user_id": 1,
@@ -648,7 +648,7 @@ def upgrade() -> None:
                 "amount": 256304.43,
                 "category": "Other",
                 "account": "BOC Current Account",
-                "is_transfer": false
+                "is_transfer": False
         }
 ]
     for i in income_data:
@@ -707,4 +707,3 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     pass
-"""
