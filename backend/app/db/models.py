@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Date, Boolean, Enum as SQLAlchemyEnum
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Date, Boolean, Enum as SQLAlchemyEnum, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -78,6 +78,10 @@ class Income(Base):
     category = Column(String, nullable=False, default="salary")
     account = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'date', 'amount', 'description', name='uq_income_entry'),
+    )
 
     owner = relationship("User")
 

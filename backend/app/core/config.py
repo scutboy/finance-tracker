@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
-    # Use Any to let us handle parsing manually in __init__
-    ALLOWED_ORIGINS: Any = ["*"] # Global wildcard to fix Charith's Network Errors
+    # Vercel deployment URL and localhost
+    ALLOWED_ORIGINS: Any = ["https://finance-tracker-gamma-black.vercel.app", "http://localhost:5173", "http://localhost:3000"]
 
     class Config:
         case_sensitive = True
