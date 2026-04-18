@@ -126,6 +126,59 @@ const Savings = () => {
           <h1 className="text-5xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">Savings</h1>
           <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60 leading-none italic ml-1">Aggregate wealth consolidation & milestone tracking.</p>
         </div>
+      {/* ── LIVE BANK ACCOUNT BALANCES ── */}
+      <div className="px-6">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-xl font-black text-slate-950 uppercase tracking-tighter italic flex items-center gap-3">
+              <Landmark size={22} className="text-blue-600"/> Live Account Balances
+            </h2>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 opacity-60">Actual bank account balances — manually updated from bank statements</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {goals?.filter(g => g.name.toLowerCase().includes('account') || g.name.toLowerCase().includes('savings a/c') || g.name.toLowerCase().includes('current'))
+            .map((acct, i) => {
+              const pct = acct.target_amount > 0 ? Math.min((acct.current_amount / acct.target_amount) * 100, 100) : 0;
+              return (
+                <div key={acct.id} className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-all duration-1000"></div>
+                  <div className="flex justify-between items-start mb-6 relative z-10">
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Bank Account</p>
+                      <p className="font-black text-slate-950 text-lg tracking-tighter italic">{acct.name}</p>
+                    </div>
+                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Landmark size={20}/></div>
+                  </div>
+                  <p className="text-3xl font-black text-slate-950 tracking-tighter italic relative z-10">{formatCurrency(acct.current_amount)}</p>
+                  <div className="mt-4 relative z-10">
+                    <div className="flex justify-between text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                      <span>{pct.toFixed(0)}% of target</span>
+                      <span>Target: {formatCurrency(acct.target_amount)}</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500 rounded-full transition-all duration-700" style={{ width: `${pct}%` }}/>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex gap-2 relative z-10">
+                    <button onClick={() => setFormModal({ open: true, editItem: acct })} className="px-4 py-2 bg-slate-50 text-slate-600 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-50 hover:text-blue-600 transition-all border border-slate-100">
+                      Update Balance
+                    </button>
+                  </div>
+                </div>
+              );
+          })}
+          {/* Static display for debit accounts not yet in DB */}
+          <div className="bg-slate-50 rounded-[2rem] p-8 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center gap-3 min-h-[180px]">
+            <Plus size={24} className="text-slate-300"/>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Add ComBank or NDB Savings A/C</p>
+            <button onClick={() => setFormModal({ open: true, editItem: null })} className="px-5 py-2 bg-white border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-600 hover:border-blue-300 hover:text-blue-600 transition-all">
+              Add Account
+            </button>
+          </div>
+        </div>
+      </div>
+
         <button onClick={() => setFormModal({ open: true, editItem: null })}
           className="group flex items-center gap-4 px-10 py-5 bg-slate-950 text-white rounded-[1.5rem] hover:bg-blue-600 transition-all font-black uppercase tracking-[0.4em] text-[10px] shadow-xl italic">
           Initialize Node
