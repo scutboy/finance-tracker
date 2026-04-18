@@ -48,9 +48,12 @@ def get_dashboard_summary(
         }
 
     # ── Savings ───────────────────────────────────────────────────────────────
-    goals = db.query(models.SavingsGoal).filter(
-        models.SavingsGoal.user_id == current_user.id
-    ).all()
+    try:
+        goals = db.query(models.SavingsGoal).filter(
+            models.SavingsGoal.user_id == current_user.id
+        ).all()
+    except Exception:
+        goals = []
     total_saved = sum(g.current_amount for g in goals)
     savings_progress = [
         {
@@ -142,11 +145,15 @@ def get_dashboard_summary(
     ).order_by(models.Expense.date.desc()).limit(4).all()
     
     for e in recent_expenses:
+        try:
+            cat = e.category.value if hasattr(e.category, 'value') else str(e.category or 'Other')
+        except Exception:
+            cat = 'Other'
         recent_txns.append({
             "type": "expense",
             "description": e.description,
             "amount": e.amount,
-            "category": e.category,
+            "category": cat,
             "date": str(e.date)
         })
         
