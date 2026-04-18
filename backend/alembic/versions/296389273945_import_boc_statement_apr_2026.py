@@ -4,7 +4,7 @@ Revision ID: 296389273945
 Revises: 3cbbb6534e68
 Create Date: 2026-04-18 13:27:24.561911
 
-\"\"\"
+"""
 from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
