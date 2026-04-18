@@ -19,13 +19,13 @@ const monthToDate = (m) => {
 
 // ── Installment Plans Data (hardcoded from bank statements) ─────────────────
 const INSTALLMENT_PLANS = [
-  { card: 'NTB AMEX',    description: 'Unity Systems Solutions',       monthly: 9441.67,  remaining: 8,  total_remaining: 66091.65, color: '#6366f1' },
-  { card: 'NTB AMEX',    description: 'Luxury X (Plan A)',              monthly: 14333.33, remaining: 7,  total_remaining: 86000.02, color: '#8b5cf6' },
-  { card: 'Sampath Card',description: 'Abans Elite 20M Appliance',     monthly: 2999.95,  remaining: 19, total_remaining: 56999.05, color: '#f59e0b' },
-  { card: 'Sampath Card',description: 'Luxury X 24M (final stretch)',   monthly: 19583.33, remaining: 2,  total_remaining: 39166.66, color: '#10b981' },
-  { card: 'NDB Card',    description: 'Bara Auto International',        monthly: 2998.00,  remaining: 0, total_remaining: 0, color: '#3b82f6' },
-  { card: 'NDB Card',    description: 'Sell-X Computers',               monthly: 2717.00,  remaining: 11, total_remaining: 29887.00, color: '#06b6d4' },
-  { card: 'NDB Card',    description: 'I Pro Mart PVT LTD',             monthly: 2248.00,  remaining: 11, total_remaining: 24728.00, color: '#0ea5e9' },
+  { card: 'Sampath Card', description: 'LUXURY X - Plan A (24M)',        monthly: 19583.33, remaining: 1,  total_remaining: 19583.33, color: '#10b981' },
+  { card: 'Sampath Card', description: 'LUXURY X - Plan B (24M)',        monthly: 19028.50, remaining: 16, total_remaining: 304456.00, color: '#f59e0b' },
+  { card: 'NTB AMEX',     description: 'LUXURY X - Plan C (12M)',        monthly: 14333.33, remaining: 6,  total_remaining: 86000.00, color: '#8b5cf6' },
+  { card: 'NTB AMEX',     description: 'UNITY SYSTEMS SOLUTIONS',        monthly: 9441.67,  remaining: 7,  total_remaining: 66091.69, color: '#6366f1' },
+  { card: 'Sampath Card', description: 'ABANS ELITE 20M Appliance',     monthly: 2999.95,  remaining: 19, total_remaining: 56999.05, color: '#ec4899' },
+  { card: 'NDB Card',     description: 'SELL-X COMPUTERS',               monthly: 2717.00,  remaining: 31, total_remaining: 84227.00, color: '#06b6d4' },
+  { card: 'NDB Card',     description: '1 PRO MART PVT LTD',             monthly: 2248.00,  remaining: 22, total_remaining: 49456.00, color: '#0ea5e9' },
 ];
 
 const CARD_COLORS = {
