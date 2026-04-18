@@ -25,6 +25,7 @@ const INSTALLMENT_PLANS = [
   { card: 'Sampath Card',description: 'Luxury X 24M (final stretch)',   monthly: 19583.33, remaining: 2,  total_remaining: 39166.66, color: '#10b981' },
   { card: 'NDB Card',    description: 'Bara Auto International',        monthly: 2998.00,  remaining: 0, total_remaining: 0, color: '#3b82f6' },
   { card: 'NDB Card',    description: 'Sell-X Computers',               monthly: 2717.00,  remaining: 11, total_remaining: 29887.00, color: '#06b6d4' },
+  { card: 'NDB Card',    description: 'I Pro Mart PVT LTD',             monthly: 2248.00,  remaining: 11, total_remaining: 24728.00, color: '#0ea5e9' },
 ];
 
 const CARD_COLORS = {
