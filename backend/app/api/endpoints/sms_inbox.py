@@ -82,6 +82,16 @@ PATTERNS = [
         "groups": {"amount": 1, "date": 2, "description": 3},
     },
     {
+        "bank": "ComBank",
+        "account": "ComBank Debit Card",
+        "type": "expense",
+        "re": re.compile(
+            r"Purchase at\s+(.+?)\s+for\s+(?:Rs\.?|LKR)\s*([\d,]+\.?\d*)\s+on\s+(\d{2}[-/][\w/]+[-/]\d{2,4})",
+            re.IGNORECASE
+        ),
+        "groups": {"amount": 2, "date": 3, "description": 1},
+    },
+    {
         "bank": "Universal",
         "account": "Unrecognized Account",
         "type": "expense",
@@ -102,9 +112,14 @@ TRANSFER_KEYWORDS = [
 def parse_date(raw: str) -> str:
     """Normalise various date formats to YYYY-MM-DD."""
     raw = raw.strip()
+    # Handle 2-digit years common in SMS (e.g. 17/04/26)
     for fmt in ("%d/%m/%Y", "%d-%b-%Y", "%d-%b-%y", "%d/%m/%y"):
         try:
-            return datetime.strptime(raw, fmt).strftime("%Y-%m-%d")
+            dt = datetime.strptime(raw, fmt)
+            # If 2-digit year was parsed as very old (e.g. 1926), fix it to 2000s
+            if dt.year < 2000:
+                dt = dt.replace(year=dt.year + 2000)
+            return dt.strftime("%Y-%m-%d")
         except ValueError:
             continue
     return raw
@@ -123,45 +138,61 @@ def parse_sms(
     payload: dict,
     current_user: models.User = Depends(get_current_user)
 ):
-    """Parse raw SMS text and return classified transactions for preview."""
+    """Parse raw SMS text and return classified transactions + unmatched lines."""
     raw = payload.get("raw_text", "")
     results = []
-    seen = set()  # simple dedupe by (date, amount, description)
+    seen = set()
+    unmatched_lines = []
+    
+    # Split by double newlines or single newlines that look like separate messages
+    lines = [l.strip() for l in re.split(r'\n+', raw) if l.strip()]
 
-    for p in PATTERNS:
-        for match in p["re"].finditer(raw):
-            g = p["groups"]
-            try:
-                amount = float(match.group(g["amount"]).replace(",", ""))
-                date_str = parse_date(match.group(g["date"]))
-                description = (
-                    match.group(g["description"]).strip()
-                    if g["description"] and match.group(g["description"])
-                    else p["bank"] + " transaction"
-                )
-            except Exception:
-                continue
+    for line in lines:
+        line_matched = False
+        for p in PATTERNS:
+            match = p["re"].search(line)
+            if match:
+                line_matched = True
+                g = p["groups"]
+                try:
+                    amount = float(match.group(g["amount"]).replace(",", ""))
+                    date_str = parse_date(match.group(g["date"]))
+                    description = (
+                        match.group(g["description"]).strip()
+                        if g["description"] and match.group(g["description"])
+                        else p["bank"] + " transaction"
+                    )
+                except Exception:
+                    continue
 
-            key = (date_str, amount, description[:30])
-            if key in seen:
-                continue
-            seen.add(key)
+                key = (date_str, amount, description[:30])
+                if key in seen:
+                    continue
+                seen.add(key)
 
-            txn_type = classify(description, p["type"])
-            results.append({
-                "bank": p["bank"],
-                "account": p["account"],
-                "type": txn_type,       # expense | income | transfer
-                "date": date_str,
-                "description": description[:100],
-                "amount": amount,
-                "category": "Other",
-                "confidence": "high",
-            })
+                txn_type = classify(description, p["type"])
+                results.append({
+                    "bank": p["bank"],
+                    "account": p["account"],
+                    "type": txn_type,
+                    "date": date_str,
+                    "description": description[:100],
+                    "amount": amount,
+                    "category": "Other",
+                    "confidence": "high",
+                })
+                break # Move to next line once one pattern matches
+        
+        if not line_matched:
+            unmatched_lines.append(line)
 
     # Sort by date
-    results.sort(key=lambda x: x["date"])
-    return {"parsed": results, "count": len(results)}
+    results.sort(key=lambda x: x["date"], reverse=True)
+    return {
+        "parsed": results, 
+        "unmatched_lines": unmatched_lines,
+        "count": len(results)
+    }
 
 
 @router.post("/confirm")
