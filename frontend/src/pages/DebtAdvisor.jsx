@@ -251,8 +251,6 @@ const DebtAdvisor = () => {
         </div>
       </div>
 
-      </div>
-
       {/* ── PER-CARD PAYMENT SCHEDULE ── THE MAIN EVENT ── */}
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
         <div className="bg-gradient-to-r from-rose-600 to-rose-500 p-8 text-white">
