@@ -199,15 +199,40 @@ const Dashboard = () => {
           {summary.debt_breakdown.map((d, i) => {
             const palette = ['bg-red-50','bg-blue-50','bg-amber-50','bg-purple-50'];
             const text    = ['text-red-600','text-blue-600','text-amber-600','text-purple-600'];
+            
+            const cardTxns = summary?.cycle_expense_transactions?.filter(t => t.account === d.name) || [];
+            const cardTotalSpent = cardTxns.reduce((s, t) => s + t.amount, 0);
+
             return (
-              <div key={i} className={`${palette[i]} rounded-2xl p-5 border border-slate-100`}>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 truncate">
-                  {d.name.replace(' Credit Card','').replace(' Card','')}
-                </p>
-                <p className={`text-xl font-black tracking-tight ${text[i]}`}>
-                  {formatCurrency(d.balance)}
-                </p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Outstanding</p>
+              <div key={i} className={`${palette[i]} rounded-[2rem] p-5 border border-slate-100 flex flex-col`}>
+                <div className="mb-4">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 truncate">
+                    {d.name.replace(' Credit Card','').replace(' Card','')}
+                  </p>
+                  <p className={`text-xl font-black tracking-tight ${text[i]}`}>
+                    {formatCurrency(d.balance)}
+                  </p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Outstanding</p>
+                </div>
+                
+                {/* Embedded Transaction List */}
+                <div className="mt-2 bg-white/60 rounded-xl p-3 flex-1 flex flex-col text-[10px]">
+                  <div className="flex justify-between items-center mb-2 pb-2 border-b border-black/5">
+                     <span className="font-black uppercase tracking-widest text-slate-500">Cycle Spend</span>
+                     <span className={`font-black ${text[i]}`}>{formatCurrency(cardTotalSpent)}</span>
+                  </div>
+                  <div className="overflow-y-auto max-h-[140px] space-y-2 pr-1 custom-scrollbar">
+                     {cardTxns.length > 0 ? cardTxns.map((t, idx) => (
+                       <div key={idx} className="flex justify-between items-start gap-2">
+                         <span className="font-bold text-slate-700 leading-tight truncate" title={t.description}>{t.description}</span>
+                         <span className="font-black text-slate-900 shrink-0">{formatCurrency(t.amount)}</span>
+                       </div>
+                     )) : (
+                       <p className="text-center font-bold text-slate-400 py-6 italic uppercase tracking-widest text-[9px]">No activity</p>
+                     )}
+                  </div>
+                </div>
+                
               </div>
             );
           })}
