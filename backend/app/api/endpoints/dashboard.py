@@ -63,6 +63,9 @@ def get_dashboard_summary(
             "percentage": min((g.current_amount / g.target_amount * 100), 100) if g.target_amount > 0 else 0
         } for g in goals
     ]
+    
+    emergency_fund = next((g for g in goals if 'emergency' in g.name.lower()), None)
+    emergency_balance = emergency_fund.current_amount if emergency_fund else 0
 
     # ── Net Worth (savings - debt) ────────────────────────────────────────────
     net_worth = total_saved - total_debt
@@ -114,6 +117,26 @@ def get_dashboard_summary(
         # monthly rate = apr/100/12, hourly = monthly/30/24
         hourly_rate = (d.interest_rate / 100) / 365 / 24
         total_hourly_leakage += d.balance * hourly_rate
+
+    # ── Budget vs Actual ──────────────────────────────────────────────────────
+    budget_categories = db.query(models.BudgetCategory).filter(
+        models.BudgetCategory.user_id == current_user.id
+    ).all()
+    
+    budget_status = []
+    for bc in budget_categories:
+        actual = db.query(func.sum(models.Expense.amount)).filter(
+            models.Expense.user_id == current_user.id,
+            models.Expense.category == bc.name,
+            models.Expense.date >= cycle_start,
+            models.Expense.is_transfer == False
+        ).scalar() or 0.0
+        budget_status.append({
+            "name": bc.name,
+            "budget": bc.monthly_budget,
+            "actual": round(actual, 2),
+            "pct": round(actual / bc.monthly_budget * 100, 1) if bc.monthly_budget > 0 else 0
+        })
 
     # ── Subscriptions ────────────────────────────────────────────────────────
     subs = db.query(models.Subscription).filter(
@@ -186,8 +209,10 @@ def get_dashboard_summary(
         "hourly_leakage": round(total_hourly_leakage, 4),
         "cash_flow": cash_flow,
         "savings_progress": savings_progress,
+        "emergency_balance": round(emergency_balance, 2),
         "debt_breakdown": debt_breakdown,
         "target_debt": target_debt,
+        "budget_status": budget_status,
         "recent_transactions": recent_txns,
         "total_subscriptions": round(total_sub_monthly, 2)
     }
