@@ -16,17 +16,17 @@ PATTERNS = [
         "account": "Boc Generic Account",
         "type": "expense",
         "re": re.compile(
-            r"Rs\.([\d,]+\.\d{2})\s+(?:has been )?debited.*?(\d{2}[-/]\w{3}[-/]\d{2,4}|\d{2}/\d{2}/\d{4}).*?(?:at|from)\s+(.+?)(?:\.|$)",
+            r"(?:Rs\.?|LKR)\s*([\d,]+\.\d{2})\s+has been (?:debited|spent|paid).*?(\d{2}[-/][\w/]+[-/]\d{2,4}).*?(?:at|from|@)\s+(.+?)(?:\.|$)",
             re.IGNORECASE | re.DOTALL
         ),
         "groups": {"amount": 1, "date": 2, "description": 3},
     },
     {
-        "bank": "BOC_CREDIT",
+        "bank": "BOC",
         "account": "Boc Generic Account",
         "type": "income",
         "re": re.compile(
-            r"Rs\.([\d,]+\.\d{2})\s+(?:has been )?credited.*?(\d{2}[-/]\w{3}[-/]\d{2,4}|\d{2}/\d{2}/\d{4})",
+            r"(?:Rs\.?|LKR)\s*([\d,]+\.\d{2})\s+has been credited.*?(\d{2}[-/][\w/]+[-/]\d{2,4})",
             re.IGNORECASE
         ),
         "groups": {"amount": 1, "date": 2, "description": None},
@@ -36,17 +36,17 @@ PATTERNS = [
         "account": "ComBank Debit Card",
         "type": "expense",
         "re": re.compile(
-            r"LKR\s*([\d,]+\.?\d*)\s+debited from A/C ending \d+ on (\d{2}/\d{2}/\d{4})\s+at\s+(.+?)(?:\.|$)",
+            r"(?:Rs\.?|LKR)\s*([\d,]+\.?\d*)\s+(?:debited|spent|paid).*?on\s+(\d{2}/\d{2}/\d{4})\s+(?:at|@)\s+(.+?)(?:\.|$)",
             re.IGNORECASE
         ),
         "groups": {"amount": 1, "date": 2, "description": 3},
     },
     {
-        "bank": "ComBank_CREDIT",
+        "bank": "ComBank",
         "account": "ComBank Debit Card",
         "type": "income",
         "re": re.compile(
-            r"LKR\s*([\d,]+\.?\d*)\s+credited to A/C ending \d+ on (\d{2}/\d{2}/\d{4})",
+            r"(?:Rs\.?|LKR)\s*([\d,]+\.?\d*)\s+credited.*?on\s+(\d{2}/\d{2}/\d{4})",
             re.IGNORECASE
         ),
         "groups": {"amount": 1, "date": 2, "description": None},
@@ -56,7 +56,7 @@ PATTERNS = [
         "account": "Sampath Credit Card",
         "type": "expense",
         "re": re.compile(
-            r"Rs\.([\d,]+\.\d{2})\s+(?:has been )?debited from your Sampath.*?(\d{2}[-/]\w{3}[-/]\d{2,4}|\d{2}/\d{2}/\d{4}).*?(?:at|@)\s*(.+?)(?:\.|$)",
+            r"(?:Rs\.?|LKR)\s*([\d,]+\.\d{2})\s+(?:has been )?(?:debited|spent|paid).*?Sampath.*?(\d{2}[-/][\w/]+[-/]\d{2,4}).*?(?:at|@)\s*(.+?)(?:\.|$)",
             re.IGNORECASE
         ),
         "groups": {"amount": 1, "date": 2, "description": 3},
@@ -66,17 +66,27 @@ PATTERNS = [
         "account": "NDB Card",
         "type": "expense",
         "re": re.compile(
-            r"NDB.*?Rs\.?\s*([\d,]+\.\d{2}).*?(\d{2}/\d{2}/\d{4}).*?(?:at|@)\s*(.+?)(?:\.|$)",
+            r"NDB.*?(?:Rs\.?|LKR)\s*([\d,]+\.\d{2}).*?(\d{2}[-/][\w/]+[-/]\d{2,4}).*?(?:at|@)\s*(.+?)(?:\.|$)",
             re.IGNORECASE
         ),
         "groups": {"amount": 1, "date": 2, "description": 3},
     },
     {
-        "bank": "NTB_AMEX",
+        "bank": "NTB",
         "account": "NTB AMEX",
         "type": "expense",
         "re": re.compile(
-            r"(?:NTB|AMEX).*?Rs\.?\s*([\d,]+\.\d{2}).*?(\d{2}/\d{2}/\d{4}).*?(?:at|@)\s*(.+?)(?:\.|$)",
+            r"(?:NTB|AMEX|Nations).*?(?:Rs\.?|LKR)\s*([\d,]+\.\d{2}).*?(\d{2}[-/][\w/]+[-/]\d{2,4}).*?(?:at|@)\s*(.+?)(?:\.|$)",
+            re.IGNORECASE
+        ),
+        "groups": {"amount": 1, "date": 2, "description": 3},
+    },
+    {
+        "bank": "Universal",
+        "account": "Unrecognized Account",
+        "type": "expense",
+        "re": re.compile(
+            r"(?:Rs\.?|LKR)\s*([\d,]+\.?\d*).*?(\d{2}[-/][\w/]+[-/]\d{2,4}).*?(?:at|from|@|to)\s+(.+?)(?:\.|$)",
             re.IGNORECASE
         ),
         "groups": {"amount": 1, "date": 2, "description": 3},

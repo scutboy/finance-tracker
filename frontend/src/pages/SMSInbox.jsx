@@ -191,11 +191,24 @@ export default function SMSInbox() {
             </table>
           </div>
           {parsed.length === 0 && (
-            <div className="py-24 text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+            <div className="py-24 px-20 text-center space-y-6">
+                <div className="mx-auto w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">
                     <AlertTriangle size={32} />
                 </div>
-                <p className="font-black text-slate-300 uppercase tracking-widest text-[11px]">No viable patterns detected in terminal cluster.</p>
+                <div className="max-w-md mx-auto space-y-2">
+                    <p className="font-black text-slate-900 uppercase tracking-tighter text-xl italic">No Transactions Extracted</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-loose">
+                        Your SMS format didn't match our bank patterns. <br/>
+                        Ensure your copy paste looks similar to: <br/>
+                        <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block mt-2 font-mono lowercase tracking-normal">Rs. 5,230.00 debited from BOC... on 18/04/2026 at Keells</span>
+                    </p>
+                </div>
+                <button 
+                  onClick={() => setParsed(null)}
+                  className="px-8 py-3 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest"
+                >
+                  Try Different Text
+                </button>
             </div>
           )}
         </div>
