@@ -155,7 +155,7 @@ def get_dashboard_summary(
             "type": "income",
             "description": i.description,
             "amount": i.amount,
-            "category": i.category,
+            "category": i.category.value if hasattr(i.category, 'value') else str(i.category or 'Other'),
             "date": str(i.date)
         })
         

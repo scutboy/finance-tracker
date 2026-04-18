@@ -187,6 +187,39 @@ const Dashboard = () => {
         )}
       </div>
 
+      {/* ── Credit Card Balances + Savings A/C ─────────────────────────────── */}
+      {!isLoading && (summary?.debt_breakdown?.length > 0 || summary?.savings_progress?.length > 0) && (
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          {summary?.debt_breakdown?.map((d, i) => {
+            const palette = ['#ef4444','#3b82f6','#f59e0b','#8b5cf6'];
+            const bg = ['bg-red-50','bg-blue-50','bg-amber-50','bg-purple-50'];
+            return (
+              <div key={i} className={`${bg[i % bg.length]} rounded-3xl p-5 border border-slate-100 hover:shadow-lg transition-all`}>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 truncate italic">
+                  {d.name.replace(' Credit Card','').replace(' Card','')} CC
+                </p>
+                <p className="text-lg font-black tracking-tighter italic" style={{ color: palette[i % palette.length] }}>
+                  {formatCurrency(d.balance)}
+                </p>
+                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">Outstanding</p>
+              </div>
+            );
+          })}
+          {summary?.savings_progress
+            ?.filter(g => g.name?.toLowerCase().includes('account') || g.name?.toLowerCase().includes('current'))
+            .map((s, i) => (
+              <div key={`sav-${i}`} className="bg-emerald-50 rounded-3xl p-5 border border-emerald-100 hover:shadow-lg transition-all">
+                <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-0.5 truncate italic">
+                  {s.name.replace(' Account','')}
+                </p>
+                <p className="text-lg font-black text-emerald-700 tracking-tighter italic">{formatCurrency(s.current)}</p>
+                <p className="text-[8px] font-black text-emerald-400 uppercase tracking-widest mt-1 italic">Available</p>
+              </div>
+            ))
+          }
+        </div>
+      )}
+
       {/* ── Subscription Leakage Analytics (New) ────────────────────────── */}
       {summary?.total_subscriptions > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">

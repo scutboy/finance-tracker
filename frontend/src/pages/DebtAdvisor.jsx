@@ -251,6 +251,145 @@ const DebtAdvisor = () => {
         </div>
       </div>
 
+      </div>
+
+      {/* ── PER-CARD PAYMENT SCHEDULE ── THE MAIN EVENT ── */}
+      <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-rose-600 to-rose-500 p-8 text-white">
+          <h2 className="text-2xl font-black uppercase tracking-tighter">📅 Your Payment Schedule — This Month</h2>
+          <p className="text-rose-100 text-[11px] font-bold uppercase tracking-wide mt-1">
+            Exact dates, exact amounts. Pay these on time to avoid penalties and reduce balances fastest.
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-slate-50 border-b border-slate-100">
+              <tr className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">
+                <th className="px-8 py-5 text-left">Card</th>
+                <th className="px-8 py-5 text-left">Pay By Date</th>
+                <th className="px-8 py-5 text-right">Minimum Due</th>
+                <th className="px-8 py-5 text-right">Recommended Pay</th>
+                <th className="px-8 py-5 text-right">Balance After</th>
+                <th className="px-8 py-5 text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {/* BOC CC — Due May 4 */}
+              <tr className="hover:bg-rose-50/30 transition-all bg-rose-50/10">
+                <td className="px-8 py-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-10 rounded-full bg-red-500"/>
+                    <div>
+                      <p className="font-black text-slate-950 uppercase tracking-tight">BOC Credit Card</p>
+                      <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest">🎯 PRIMARY TARGET</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-8 py-6">
+                  <div className="bg-red-100 text-red-700 font-black text-sm px-4 py-2 rounded-xl inline-block uppercase">4 May 2026</div>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-950">LKR 23,017</td>
+                <td className="px-8 py-6 text-right">
+                  <p className="font-black text-emerald-600 text-lg">LKR 73,017</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase">Min + 50,000 extra</p>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-700">≈ LKR 387,328</td>
+                <td className="px-8 py-6">
+                  <span className="bg-rose-100 text-rose-700 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">Pay Online via BOC</span>
+                </td>
+              </tr>
+              {/* NDB — Due Apr 30 */}
+              <tr className="hover:bg-blue-50/30 transition-all">
+                <td className="px-8 py-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-10 rounded-full bg-blue-500"/>
+                    <div>
+                      <p className="font-black text-slate-950 uppercase tracking-tight">NDB Visa Platinum</p>
+                      <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">26% APR — Urgent</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-8 py-6">
+                  <div className="bg-orange-100 text-orange-700 font-black text-sm px-4 py-2 rounded-xl inline-block uppercase">30 Apr 2026</div>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-950">LKR 4,960</td>
+                <td className="px-8 py-6 text-right">
+                  <p className="font-black text-emerald-600 text-lg">LKR 15,000</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase">3× minimum</p>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-700">≈ LKR 109,010</td>
+                <td className="px-8 py-6">
+                  <span className="bg-blue-100 text-blue-700 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">CEFT from BOC</span>
+                </td>
+              </tr>
+              {/* Sampath CC — Due Apr 20 */}
+              <tr className="hover:bg-amber-50/30 transition-all">
+                <td className="px-8 py-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-10 rounded-full bg-amber-500"/>
+                    <div>
+                      <p className="font-black text-slate-950 uppercase tracking-tight">Sampath Credit Card</p>
+                      <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest">26% APR — Has installments</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-8 py-6">
+                  <div className="bg-red-100 text-red-700 font-black text-sm px-4 py-2 rounded-xl inline-block uppercase">20 Apr 2026 ⚠️</div>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-950">LKR 8,852</td>
+                <td className="px-8 py-6 text-right">
+                  <p className="font-black text-emerald-600 text-lg">LKR 20,000</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase">Covers instalments</p>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-700">≈ LKR 232,915</td>
+                <td className="px-8 py-6">
+                  <span className="bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">CEFT from BOC</span>
+                </td>
+              </tr>
+              {/* AMEX — Due May 8 */}
+              <tr className="hover:bg-purple-50/30 transition-all">
+                <td className="px-8 py-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-10 rounded-full bg-purple-500"/>
+                    <div>
+                      <p className="font-black text-slate-950 uppercase tracking-tight">NTB AMEX</p>
+                      <p className="text-[9px] font-black text-purple-500 uppercase tracking-widest">Installment card — don't overpay</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-8 py-6">
+                  <div className="bg-purple-100 text-purple-700 font-black text-sm px-4 py-2 rounded-xl inline-block uppercase">~8 May 2026</div>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-950">LKR 5,000</td>
+                <td className="px-8 py-6 text-right">
+                  <p className="font-black text-emerald-600 text-lg">LKR 5,000</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase">Min only — plans auto-debit</p>
+                </td>
+                <td className="px-8 py-6 text-right font-black text-slate-700">≈ LKR 164,554</td>
+                <td className="px-8 py-6">
+                  <span className="bg-purple-100 text-purple-700 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">NTB Online Pay</span>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot className="bg-slate-950 text-white">
+              <tr>
+                <td className="px-8 py-5 font-black text-[10px] uppercase tracking-widest" colSpan={2}>Total This Month</td>
+                <td className="px-8 py-5 text-right font-black text-rose-400">LKR 41,829</td>
+                <td className="px-8 py-5 text-right font-black text-emerald-400 text-lg">LKR 113,017</td>
+                <td className="px-8 py-5"/>
+                <td className="px-8 py-5 text-right text-[9px] font-black text-white/40 uppercase">Recommended total outflow</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div className="p-6 bg-amber-50 border-t border-amber-100 flex items-start gap-4">
+          <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5"/>
+          <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wide">
+            ⚠️ Sampath due date 20 Apr is IMMINENT — pay LKR 20,000 today if not yet done. Late payment = 26% penalty + credit score damage.
+          </p>
+        </div>
+      </div>
+
       {/* ── ACCOUNTANT'S PLAN ── */}
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
         <div className="bg-gradient-to-r from-slate-950 to-slate-800 p-10 text-white">

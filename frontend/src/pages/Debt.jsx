@@ -142,11 +142,32 @@ const Debt = () => {
     queryFn: async () => (await api.get('/debts/')).data,
   });
 
+  const { data: ccTransactions } = useQuery({
+    queryKey: ['ccTransactions', debts?.map(d => d.id)],
+    queryFn: async () => {
+      const res = await api.get('/expenses/?limit=200');
+      return res.data?.filter(e => e.linked_card_id != null || e.account?.toLowerCase().includes('credit')) || [];
+    },
+    enabled: !!debts?.length,
+  });
+
   const allPayments = useMemo(() => {
     if (!debts) return [];
     return debts.flatMap(d => (d.payments || []).map(p => ({ ...p, debtName: d.name })))
       .sort((a,b) => new Date(b.payment_date) - new Date(a.payment_date));
   }, [debts]);
+
+  const allCCTransactions = useMemo(() => {
+    if (!ccTransactions || !debts) return [];
+    const debtMap = Object.fromEntries(debts.map(d => [d.id, d.name]));
+    return ccTransactions
+      .map(e => ({
+        ...e,
+        cardName: debtMap[e.linked_card_id] || e.account || 'CC',
+      }))
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 40);
+  }, [ccTransactions, debts]);
 
   const activeTargets = useMemo(() => {
     if (!debts) return [];
@@ -259,58 +280,67 @@ const Debt = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 px-6">
-         <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 group hover:shadow-2xl transition-all duration-700 italic">
-            <div className="p-10 border-b border-slate-50 flex justify-between items-center">
-               <h2 className="text-2xl font-black text-slate-950 uppercase tracking-tighter flex items-center gap-5">
-                  <History size={28} className="text-emerald-500" /> Transaction Trace
-               </h2>
-               <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><Zap size={18}/></div>
-            </div>
-            <div className="p-8 space-y-4 max-h-[500px] overflow-y-auto">
-               {allPayments.length > 0 ? allPayments.map((p, idx) => (
-                 <div key={idx} className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] hover:bg-emerald-50 transition-all border border-slate-100/50 group/row">
-                    <div className="flex items-center gap-6">
-                       <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-slate-100"><DollarSign size={24}/></div>
-                       <div>
-                          <p className="font-black text-slate-950 text-lg tracking-tighter uppercase leading-none mb-1 uppercase">{p.debtName}</p>
-                          <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
-                             <Calendar size={12}/> {new Date(p.payment_date).toLocaleDateString()}
-                          </div>
-                       </div>
+      <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden mx-6 italic">
+        <div className="p-10 border-b border-slate-50 flex justify-between items-center">
+          <h2 className="text-2xl font-black text-slate-950 uppercase tracking-tighter flex items-center gap-5">
+            <History size={28} className="text-slate-400"/> CC Transaction Ledger
+          </h2>
+          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{allCCTransactions.length} entries</span>
+        </div>
+        <div className="max-h-[520px] overflow-y-auto divide-y divide-slate-50">
+          {allCCTransactions.length > 0 ? allCCTransactions.map((txn, idx) => {
+            const isPayment = txn.category === 'CC Payment';
+            const cardColors = {
+              'BOC Credit Card': '#ef4444', 'NDB Card': '#3b82f6',
+              'Sampath Card': '#f59e0b', 'NTB AMEX': '#8b5cf6'
+            };
+            const color = cardColors[txn.cardName] || '#64748b';
+            return (
+              <div key={idx} className="flex items-center justify-between px-8 py-5 hover:bg-slate-50 transition-all group/row">
+                <div className="flex items-center gap-5">
+                  <div className="w-2 h-10 rounded-full shrink-0" style={{ background: isPayment ? '#10b981' : color }}/>
+                  <div>
+                    <p className="font-black text-slate-950 text-sm tracking-tighter uppercase leading-none mb-1 group-hover/row:text-blue-600 transition-colors">{txn.description}</p>
+                    <div className="flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                      <span>{txn.date}</span>
+                      <span className="text-slate-200">•</span>
+                      <span style={{ color }}>{txn.cardName?.replace(' Credit Card','').replace(' Card','')}</span>
+                      {txn.category && <span className="text-slate-200">• {txn.category}</span>}
                     </div>
-                    <div className="text-right">
-                       <p className="text-2xl font-black text-emerald-600 tracking-tighter italic">-{formatCurrency(p.amount)}</p>
-                       <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic opacity-40">VERIFIED</span>
-                    </div>
-                 </div>
-               )) : (
-                 <div className="py-20 text-center opacity-20 uppercase font-black text-[10px] tracking-[0.5em]">No validated payments recorded</div>
-               )}
-            </div>
-         </div>
-         <div className="bg-slate-950 rounded-[3rem] p-12 text-white border border-white/5 flex flex-col justify-between group overflow-hidden relative shadow-3xl h-full italic">
-            <div className="absolute top-[-100px] right-[-100px] w-96 h-96 bg-rose-600/5 rounded-full blur-[100px] group-hover:scale-110 transition-all duration-[5000ms] pointer-events-none"></div>
-            <div className="space-y-8 relative z-10">
-               <div className="space-y-4">
-                  <h2 className="text-3xl font-black italic uppercase tracking-tighter">Neutralization</h2>
-                  <p className="text-[12px] text-slate-400 font-bold uppercase tracking-[0.2em] leading-loose opacity-60">Execute high-velocity debt dissolution protocols. Log all outflows to maintain perimeter integrity and delta accuracy.</p>
-               </div>
-               <button onClick={() => window.location.href='/debt-advisor'}
-                 className="w-full p-8 bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-between group/btn hover:bg-white/10 transition-all mt-10">
-                  <div className="flex items-center gap-6">
-                     <div className="p-4 bg-white/10 text-rose-500 rounded-2xl group-hover/btn:scale-110 transition-all"><ShieldAlert size={32}/></div>
-                     <div className="text-left">
-                        <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.5em] mb-1">Launch Strategizer</p>
-                        <p className="text-2xl font-black italic uppercase tracking-tighter">Compute Delta Strategy</p>
-                     </div>
                   </div>
-                  <ChevronRight size={28} className="opacity-20 group-hover/btn:translate-x-2 transition-all" />
-               </button>
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-[1em] text-white/20 text-center mt-16 italic opacity-20">System Integrity Verified 2.8.5</p>
-         </div>
+                </div>
+                <p className={`text-lg font-black tracking-tighter italic ${isPayment ? 'text-emerald-600' : 'text-slate-950'}`}>
+                  {isPayment ? '-' : ''}{formatCurrency(txn.amount)}
+                </p>
+              </div>
+            );
+          }) : (
+            <div className="py-20 text-center font-black text-slate-300 uppercase tracking-widest text-[10px] italic">No CC transactions found</div>
+          )}
+        </div>
       </div>
+
+      <div className="px-6 italic">
+        <div className="bg-slate-950 rounded-[3rem] p-12 text-white border border-white/5 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-rose-600/5 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="space-y-6 relative z-10">
+            <h2 className="text-3xl font-black italic uppercase tracking-tighter">Neutralization</h2>
+            <p className="text-[12px] text-slate-400 font-bold uppercase tracking-[0.2em] leading-loose opacity-60">Execute high-velocity debt dissolution protocols. Log all outflows to maintain perimeter integrity and delta accuracy.</p>
+            <button onClick={() => window.location.href='/debt-advisor'}
+              className="w-full p-8 bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-between hover:bg-white/10 transition-all">
+              <div className="flex items-center gap-6">
+                <div className="p-4 bg-white/10 text-rose-500 rounded-2xl"><ShieldAlert size={32}/></div>
+                <div className="text-left">
+                  <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.5em] mb-1">Launch Strategizer</p>
+                  <p className="text-2xl font-black italic uppercase tracking-tighter">Compute Delta Strategy</p>
+                </div>
+              </div>
+              <ChevronRight size={28} className="opacity-20" />
+            </button>
+          </div>
+        </div>
+      </div>
+
 
       {formModal.open && <DebtFormModal editItem={formModal.editItem} onClose={() => setFormModal({ open: false, editItem: null })} onSuccess={() => { queryClient.invalidateQueries({ queryKey:['debts'] }); queryClient.invalidateQueries({ queryKey:['debtProjection'] }); }} />}
       {paymentModal.open && <PaymentModal debt={paymentModal.debt} onClose={() => setPaymentModal({ open: false, debt: null })} onSuccess={() => { queryClient.invalidateQueries({ queryKey:['debts'] }); queryClient.invalidateQueries({ queryKey:['debtProjection'] }); queryClient.invalidateQueries({ queryKey:['dashboardSummary'] }); }} />}
