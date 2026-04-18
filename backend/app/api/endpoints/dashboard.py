@@ -21,12 +21,14 @@ def get_dashboard_summary(
     if now.day >= 25:
         # We are past the 25th, so the cycle started this month
         cycle_start = datetime(now.year, now.month, 25).date()
+        cycle_end = datetime(now.year + (1 if now.month == 12 else 0), (now.month % 12) + 1, 24).date()
     else:
         # We are before the 25th, so the cycle started last month
         if now.month == 1:
             cycle_start = datetime(now.year - 1, 12, 25).date()
         else:
             cycle_start = datetime(now.year, now.month - 1, 25).date()
+        cycle_end = datetime(now.year, now.month, 24).date()
 
     # ── Debt ──────────────────────────────────────────────────────────────────
     active_debts = db.query(models.Debt).filter(
@@ -74,12 +76,14 @@ def get_dashboard_summary(
     current_month_expenses = db.query(func.sum(models.Expense.amount)).filter(
         models.Expense.user_id == current_user.id,
         models.Expense.date >= cycle_start,
+        models.Expense.date <= cycle_end,
         models.Expense.is_transfer == False
     ).scalar() or 0.0
 
     current_month_income = db.query(func.sum(models.Income.amount)).filter(
         models.Income.user_id == current_user.id,
-        models.Income.date >= cycle_start
+        models.Income.date >= cycle_start,
+        models.Income.date <= cycle_end
     ).scalar() or 0.0
 
     net_cash_flow = current_month_income - current_month_expenses
@@ -129,6 +133,7 @@ def get_dashboard_summary(
             models.Expense.user_id == current_user.id,
             models.Expense.category == bc.name,
             models.Expense.date >= cycle_start,
+            models.Expense.date <= cycle_end,
             models.Expense.is_transfer == False
         ).scalar() or 0.0
         budget_status.append({
@@ -158,7 +163,8 @@ def get_dashboard_summary(
 
     # ── Recent Income entries (last 5) ────────────────────────────────────────
     recent_income = db.query(models.Income).filter(
-        models.Income.user_id == current_user.id
+        models.Income.user_id == current_user.id,
+        models.Income.date <= now.date()
     ).order_by(models.Income.date.desc()).limit(5).all()
 
     # Get recent transactions (both income and expenses) for the Flux Trace
@@ -166,7 +172,8 @@ def get_dashboard_summary(
     
     # Get last 4 expenses
     recent_expenses = db.query(models.Expense).filter(
-        models.Expense.user_id == current_user.id
+        models.Expense.user_id == current_user.id,
+        models.Expense.date <= now.date()
     ).order_by(models.Expense.date.desc()).limit(4).all()
     
     for e in recent_expenses:
@@ -195,13 +202,15 @@ def get_dashboard_summary(
     # Income for this cycle
     cycle_income_txns = db.query(models.Income).filter(
         models.Income.user_id == current_user.id,
-        models.Income.date >= cycle_start
+        models.Income.date >= cycle_start,
+        models.Income.date <= cycle_end
     ).order_by(models.Income.date.desc()).all()
 
     # Expenses for this cycle
     cycle_expense_txns = db.query(models.Expense).filter(
         models.Expense.user_id == current_user.id,
         models.Expense.date >= cycle_start,
+        models.Expense.date <= cycle_end,
         models.Expense.is_transfer == False
     ).order_by(models.Expense.date.desc()).all()
 
