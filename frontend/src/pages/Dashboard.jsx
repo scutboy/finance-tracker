@@ -125,7 +125,35 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* System Integrity & Trace Layer */}
+      {/* ── Credit Card Balances + Savings A/C Quick View ── */}
+      <div className="px-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
+          {isLoading ? (
+            [1,2,3,4,5].map(i => <div key={i} className="h-28 bg-white rounded-3xl animate-pulse border border-slate-100"/>)
+          ) : (
+            <>
+              {summary?.debt_breakdown?.map((d, i) => {
+                const colors = ['#ef4444','#3b82f6','#f59e0b','#8b5cf6'];
+                return (
+                  <div key={i} className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:shadow-lg transition-all group">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 truncate">{d.name.replace(' Credit Card','CC').replace(' Card','')}</p>
+                    <p className="text-xl font-black tracking-tighter italic" style={{ color: colors[i % colors.length] }}>{formatCurrency(d.balance)}</p>
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1">Outstanding</p>
+                  </div>
+                );
+              })}
+              {summary?.savings_progress?.filter(g => g.name?.toLowerCase().includes('account') || g.name?.toLowerCase().includes('current')).map((s, i) => (
+                <div key={`sav-${i}`} className="bg-blue-50 rounded-3xl p-5 shadow-sm border border-blue-100 hover:shadow-lg transition-all">
+                  <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1 truncate">{s.name}</p>
+                  <p className="text-xl font-black text-blue-700 tracking-tighter italic">{formatCurrency(s.current)}</p>
+                  <p className="text-[9px] font-black text-blue-300 uppercase tracking-widest mt-1">Available</p>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-12 px-6">
          {/* Asset Resilience Stats */}
          <div className="xl:col-span-3 bg-slate-950 rounded-[5rem] p-20 shadow-4xl text-white relative overflow-hidden group hover:scale-[1.01] transition-transform duration-1000 min-h-[450px] flex flex-col justify-between">
@@ -139,7 +167,7 @@ const Dashboard = () => {
                   </div>
                </div>
                <div>
-                  <p className="text-8xl font-black tracking-tighter italic leading-none drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 origin-left">{formatCurrency(summary?.net_savings || 0)}</p>
+                  <p className="text-8xl font-black tracking-tighter italic leading-none drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 origin-left">{formatCurrency(summary?.net_worth || 0)}</p>
                   <p className="text-[12px] font-black text-slate-500 uppercase tracking-[0.6em] mt-10 italic leading-none opacity-60">Verified Liquid & Future Assets Locked</p>
                </div>
             </div>
