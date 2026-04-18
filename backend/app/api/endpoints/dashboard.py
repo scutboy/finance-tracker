@@ -35,13 +35,15 @@ def get_dashboard_summary(
         models.Debt.user_id == current_user.id,
         models.Debt.status != models.DebtStatusEnum.paid_off
     ).all()
+    # Dashboard filters (Remove Gold Loan from summary view)
+    dashboard_debts = [d for d in active_debts if "gold" not in d.name.lower()]
     total_debt = sum(d.balance for d in active_debts)
-    debt_breakdown = [{"name": d.name, "balance": d.balance} for d in active_debts]
+    debt_breakdown = [{"name": d.name, "balance": d.balance} for d in dashboard_debts]
     
-    # Target Debt (Snowball default - lowest balance)
+    # Target Debt (Snowball default - lowest balance, excluding Gold Loan)
     target_debt = None
-    if active_debts:
-        sorted_debts = sorted(active_debts, key=lambda d: d.balance)
+    if dashboard_debts:
+        sorted_debts = sorted(dashboard_debts, key=lambda d: d.balance)
         target_debt = {
             "id": sorted_debts[0].id,
             "name": sorted_debts[0].name,
@@ -83,7 +85,8 @@ def get_dashboard_summary(
     current_month_income = db.query(func.sum(models.Income.amount)).filter(
         models.Income.user_id == current_user.id,
         models.Income.date >= cycle_start,
-        models.Income.date <= cycle_end
+        models.Income.date <= cycle_end,
+        models.Income.is_transfer == False
     ).scalar() or 0.0
 
     net_cash_flow = current_month_income - current_month_expenses
@@ -160,6 +163,9 @@ def get_dashboard_summary(
 
     # Add subscription costs to current month expenses for a more accurate "Leakage" view
     current_month_expenses += total_sub_monthly
+    
+    # RECALIBRATION: Net Cash Flow MUST be calculated AFTER subscriptions are added
+    net_cash_flow = current_month_income - current_month_expenses
 
     # ── Recent Income entries (last 5) ────────────────────────────────────────
     recent_income = db.query(models.Income).filter(

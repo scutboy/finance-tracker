@@ -77,6 +77,7 @@ class Income(Base):
     amount = Column(Float, nullable=False)
     category = Column(String, nullable=False, default="salary")
     account = Column(String, nullable=True)
+    is_transfer = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
