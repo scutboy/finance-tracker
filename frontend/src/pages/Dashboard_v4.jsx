@@ -18,7 +18,8 @@ import {
   Flame,
   LifeBuoy,
   RefreshCw,
-  Wallet
+  Wallet,
+  History
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
