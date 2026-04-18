@@ -146,12 +146,33 @@ const Dashboard = () => {
         <MetricCard title="Net Cash Flow" amount={summary?.net_cash_flow || 0} subtitle="Surplus / Deficit" icon={Wallet} colorClass="text-blue-500" gradientClass="bg-blue-50" />
       </div>
 
+      {/* ── Credit Card Balance Strip ─────────────────────────── */}
+      {summary?.debt_breakdown?.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {summary.debt_breakdown.map((d, i) => {
+            const palette = ['bg-red-50','bg-blue-50','bg-amber-50','bg-purple-50'];
+            const text    = ['text-red-600','text-blue-600','text-amber-600','text-purple-600'];
+            return (
+              <div key={i} className={`${palette[i]} rounded-2xl p-5 border border-slate-100`}>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 truncate">
+                  {d.name.replace(' Credit Card','').replace(' Card','')}
+                </p>
+                <p className={`text-xl font-black tracking-tight ${text[i]}`}>
+                  {formatCurrency(d.balance)}
+                </p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Outstanding</p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* ── 6-Month Cash Flow Chart ─────────────────────────────── */}
       {summary?.cash_flow && summary.cash_flow.length > 0 && (
          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
              <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><TrendingUp size={20}/> 6-Month Cash Flow</h3>
              <ResponsiveContainer width="100%" height={280}>
-               <BarChart data={[...summary.cash_flow].reverse()}>
+               <BarChart data={summary.cash_flow}>
                  <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
                  <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
                  <Tooltip formatter={v => formatCurrency(v)} cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'}} />
@@ -163,43 +184,44 @@ const Dashboard = () => {
          </div>
       )}
 
-      {/* ── Credit Cards, Focus Debt, and Budget ────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* Left Side: Debt & Survival */}
-        <div className="space-y-8">
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-800 mb-5">Focus Debt</h3>
-              {summary?.target_debt ? (
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                     <div>
-                        <p className="text-sm font-bold text-slate-500 mb-1">{summary.target_debt.name}</p>
-                        <p className="text-2xl font-black text-rose-600 tracking-tight">{formatCurrency(summary.target_debt.balance)}</p>
-                        <p className="text-xs font-bold text-slate-400 mt-2 bg-rose-50 inline-block px-2 py-1 rounded-md">@{summary.target_debt.interest_rate}% APR</p>
-                     </div>
-                     <div className="text-right">
-                        <span className="text-xs font-black uppercase text-rose-500 tracking-wider">Pay Extra Here</span>
-                     </div>
-                  </div>
-              ) : (
-                  <p className="text-slate-400 text-sm">No active debts flagged for payoff.</p>
-              )}
-            </div>
+      {/* ── Leakage + Runway Row (full width, naturally balanced) ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LeakagePulse hourlyRate={summary?.hourly_leakage} />
+          
+          <div className="bg-white rounded-[2rem] p-8 border border-emerald-100 bg-emerald-50/30 shadow-sm flex flex-col justify-between group">
+              <div className="flex items-center justify-between mb-6">
+              <div className="p-3 bg-emerald-100 text-emerald-600 rounded-2xl"><LifeBuoy size={24} /></div>
+              <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Emergency Fund Coverage</p>
+              </div>
+              </div>
+              <div className="relative py-2">
+              <p className="text-5xl font-black text-emerald-950 tracking-tight">{survivalRunway} <span className="text-xl text-emerald-600">Months</span></p>
+              </div>
+              <p className="text-sm font-medium text-emerald-700 mt-2">Saved: {formatCurrency(summary?.emergency_balance || 0)}</p>
+          </div>
+      </div>
 
-            <LeakagePulse hourlyRate={summary?.hourly_leakage} />
-            
-            <div className="bg-white rounded-[2rem] p-8 border border-emerald-100 bg-emerald-50/30 shadow-sm flex flex-col justify-between group">
-                <div className="flex items-center justify-between mb-6">
-                <div className="p-3 bg-emerald-100 text-emerald-600 rounded-2xl"><LifeBuoy size={24} /></div>
-                <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Emergency Fund Coverage</p>
-                </div>
-                </div>
-                <div className="relative py-2">
-                <p className="text-5xl font-black text-emerald-950 tracking-tight">{survivalRunway} <span className="text-xl text-emerald-600">Months</span></p>
-                </div>
-                <p className="text-sm font-medium text-emerald-700 mt-2">Saved: {formatCurrency(summary?.emergency_balance || 0)}</p>
-            </div>
+      {/* ── Focus Debt + Budget (now symmetrical) ──────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+        {/* Left Side: Focus Debt */}
+        <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm h-full">
+          <h3 className="text-lg font-bold text-slate-800 mb-5">Focus Debt</h3>
+          {summary?.target_debt ? (
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                 <div>
+                    <p className="text-sm font-bold text-slate-500 mb-1">{summary.target_debt.name}</p>
+                    <p className="text-2xl font-black text-rose-600 tracking-tight">{formatCurrency(summary.target_debt.balance)}</p>
+                    <p className="text-xs font-bold text-slate-400 mt-2 bg-rose-50 inline-block px-2 py-1 rounded-md">@{summary.target_debt.interest_rate}% APR</p>
+                 </div>
+                 <div className="text-right">
+                    <span className="text-xs font-black uppercase text-rose-500 tracking-wider">Pay Extra Here</span>
+                 </div>
+              </div>
+          ) : (
+              <p className="text-slate-400 text-sm">No active debts flagged for payoff.</p>
+          )}
         </div>
 
         {/* Right Side: Budget Status */}
