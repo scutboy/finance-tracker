@@ -23,7 +23,7 @@ const INSTALLMENT_PLANS = [
   { card: 'NTB AMEX',    description: 'Luxury X (Plan A)',              monthly: 14333.33, remaining: 7,  total_remaining: 86000.02, color: '#8b5cf6' },
   { card: 'Sampath Card',description: 'Abans Elite 20M Appliance',     monthly: 2999.95,  remaining: 19, total_remaining: 56999.05, color: '#f59e0b' },
   { card: 'Sampath Card',description: 'Luxury X 24M (final stretch)',   monthly: 19583.33, remaining: 2,  total_remaining: 39166.66, color: '#10b981' },
-  { card: 'NDB Card',    description: 'Bara Auto International',        monthly: 2998.00,  remaining: 11, total_remaining: 32978.00, color: '#3b82f6' },
+  { card: 'NDB Card',    description: 'Bara Auto International',        monthly: 2998.00,  remaining: 0, total_remaining: 0, color: '#3b82f6' },
   { card: 'NDB Card',    description: 'Sell-X Computers',               monthly: 2717.00,  remaining: 11, total_remaining: 29887.00, color: '#06b6d4' },
 ];
 
