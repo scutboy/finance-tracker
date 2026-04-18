@@ -93,6 +93,7 @@ class Debt(Base):
     name = Column(String, nullable=False)
     type = Column(SQLAlchemyEnum(DebtTypeEnum), nullable=False)
     balance = Column(Float, nullable=False)
+    opening_balance = Column(Float, default=0.0)
     credit_limit = Column(Float)
     interest_rate = Column(Float, nullable=False)
     min_payment = Column(Float, nullable=False)
@@ -171,3 +172,28 @@ class Subscription(Base):
 
     owner = relationship("User")
     linked_card = relationship("Debt")
+
+class Transfer(Base):
+    __tablename__ = "transfers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    date = Column(Date, nullable=False)
+    from_account = Column(String, nullable=False)
+    to_account = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)
+    description = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    owner = relationship("User")
+
+class AccountBalance(Base):
+    __tablename__ = "account_balances"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    account_name = Column(String, nullable=False)
+    opening_balance = Column(Float, default=0.0)
+    as_of_date = Column(Date, nullable=False)
+
+    owner = relationship("User")
