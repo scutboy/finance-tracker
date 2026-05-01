@@ -45,24 +45,31 @@ const LeakagePulse = ({ hourlyRate }) => {
 
 const MetricCard = ({ title, amount, subtitle, icon: Icon, colorClass, gradientClass }) => {
   return (
-    <div className="relative group overflow-hidden bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 p-8 flex flex-col justify-between min-h-[180px]">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+    <div className="relative group overflow-hidden bg-white rounded-2xl lg:rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 p-4 lg:p-8 flex flex-col justify-between min-h-[110px] lg:min-h-[180px]">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-700"></div>
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-4">
-          <div className={`p-3 rounded-2xl ${gradientClass} transition-all duration-300 group-hover:scale-110 shadow-sm border border-slate-50`}>
-            <Icon className={colorClass} size={22} />
+        <div className="flex items-center justify-between mb-2 lg:mb-4">
+          <div className={`p-2 lg:p-3 rounded-xl lg:rounded-2xl ${gradientClass} transition-all duration-300 group-hover:scale-110 shadow-sm`}>
+            <Icon className={colorClass} size={16} />
           </div>
         </div>
-        <p className="text-[12px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-2 leading-none">{title}</p>
-        <h3 className="text-3xl font-black text-slate-900 tracking-tighter leading-none group-hover:text-blue-600 transition-colors duration-300">
+        <p className="text-[9px] lg:text-[12px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-1 leading-none">{title}</p>
+        <h3 className="text-lg lg:text-3xl font-black text-slate-900 tracking-tighter leading-none group-hover:text-blue-600 transition-colors duration-300">
           {formatCurrency(amount)}
         </h3>
       </div>
-      <div className="relative z-10 pt-4 mt-auto">
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em]">{subtitle}</p>
+      <div className="relative z-10 pt-2 lg:pt-4 mt-auto">
+        <p className="text-[9px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em]">{subtitle}</p>
       </div>
     </div>
   );
+};
+
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
 };
 
 const Dashboard = () => {
@@ -76,18 +83,28 @@ const Dashboard = () => {
   });
 
   const healthStatus = useMemo(() => {
-    if (!summary) return { label: 'Loading...', color: 'text-slate-500', icon: Activity, bg: 'bg-slate-100' };
+    if (!summary) return { label: 'Analysing...', color: 'text-slate-500', icon: Activity, bg: 'bg-slate-100', detail: '' };
     const income = summary.total_income || summary.monthly_income || 1;
     const expenses = summary.total_expenses || summary.monthly_expenses || 0;
     const debt = summary.total_debt || 0;
-    
-    const debtRatio = debt / income;
-    const flowRatio = expenses / income;
-    
-    if (debtRatio > 12 || flowRatio > 0.95) return { label: '🔴 Spending Exceeds Income', color: 'text-rose-600', icon: ShieldAlert, bg: 'bg-rose-50' };
-    if (debtRatio > 6) return { label: '⚠️ High Debt Load', color: 'text-amber-600', icon: AlertTriangle, bg: 'bg-amber-50' };
-    if (summary.net_worth < 0) return { label: 'Net Negative Equity', color: 'text-rose-500', icon: Target, bg: 'bg-rose-50' };
-    return { label: '✅ On Track', color: 'text-emerald-600', icon: ShieldCheck, bg: 'bg-emerald-50' };
+    const saved = summary.emergency_balance || 0;
+    const monthlyExp = summary.monthly_expenses || 1;
+
+    const debtToIncome = debt / (income || 1);
+    const spendRatio   = expenses / (income || 1);
+    const runwayMonths = saved / monthlyExp;
+
+    if (spendRatio > 1)
+      return { label: 'Spending Exceeds Income', color: 'text-rose-600', icon: ShieldAlert, bg: 'bg-rose-50', detail: `Overspending by ${Math.round((spendRatio-1)*100)}%` };
+    if (debtToIncome > 10)
+      return { label: 'Critical Debt Load', color: 'text-rose-600', icon: ShieldAlert, bg: 'bg-rose-50', detail: `Debt is ${debtToIncome.toFixed(1)}× monthly income` };
+    if (debtToIncome > 5)
+      return { label: 'High Debt Pressure', color: 'text-amber-600', icon: AlertTriangle, bg: 'bg-amber-50', detail: `Debt is ${debtToIncome.toFixed(1)}× monthly income` };
+    if (runwayMonths < 1)
+      return { label: 'No Emergency Buffer', color: 'text-amber-600', icon: AlertTriangle, bg: 'bg-amber-50', detail: 'Less than 1 month runway' };
+    if (spendRatio > 0.85)
+      return { label: 'Tight Cash Flow', color: 'text-amber-600', icon: AlertTriangle, bg: 'bg-amber-50', detail: `${Math.round(spendRatio*100)}% of income spent` };
+    return { label: 'Financially Stable', color: 'text-emerald-600', icon: ShieldCheck, bg: 'bg-emerald-50', detail: `Spending ${Math.round(spendRatio*100)}% of income` };
   }, [summary]);
 
   const survivalRunway = useMemo(() => {
@@ -114,7 +131,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-12 lg:space-y-10 pb-40">
+    <div className="space-y-6 lg:space-y-10 pb-40 px-0">
       {isError && (
         <div className="mx-6 p-8 bg-rose-50 text-rose-700 rounded-3xl border border-rose-200 shadow-sm">
            <div className="flex items-center gap-4 mb-2">
@@ -127,31 +144,32 @@ const Dashboard = () => {
       )}
 
       {/* ── Header ────────────────────────────────────── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-        <div className="space-y-3">
-          <p className="text-slate-500 font-bold text-sm uppercase tracking-wider italic">Cycle: {cycleDates}</p>
-          <div className="flex items-center gap-6">
-            <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900 leading-none italic uppercase">Good morning, {firstName}</h1>
-            <Link to="/sms-inbox" className="hidden lg:flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 italic">
-                <MessageSquare size={14} />
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-8">
+        <div className="space-y-2">
+          <p className="text-slate-400 font-bold text-xs uppercase tracking-widest italic">Cycle: {cycleDates}</p>
+          <div className="flex flex-wrap items-center gap-3 lg:gap-6">
+            <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-slate-900 leading-none italic uppercase">{getGreeting()}, {firstName}</h1>
+            <Link to="/sms-inbox" className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 italic">
+                <MessageSquare size={13} />
                 Ingest SMS
             </Link>
           </div>
         </div>
-        <div className={`flex items-center gap-6 p-6 lg:p-6 ${healthStatus.bg} rounded-3xl min-w-full lg:min-w-[320px] transition-all`}>
-           <div className={`p-4 bg-white rounded-full ${healthStatus.color} shadow-sm`}><healthStatus.icon size={28} /></div>
-           <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 italic">Financial Health</p>
-              <p className={`text-xl font-black tracking-tight ${healthStatus.color} italic`}>{healthStatus.label}</p>
+        <div className={`flex items-center gap-4 p-4 lg:p-6 ${healthStatus.bg} rounded-2xl lg:rounded-3xl w-full lg:min-w-[340px] lg:w-auto transition-all`}>
+           <div className={`p-3 lg:p-4 bg-white rounded-full ${healthStatus.color} shadow-sm shrink-0`}><healthStatus.icon size={22} /></div>
+           <div className="min-w-0">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5 italic">Financial Health</p>
+              <p className={`text-base lg:text-lg font-black tracking-tight ${healthStatus.color} italic leading-tight`}>{healthStatus.label}</p>
+              {healthStatus.detail && <p className="text-[10px] font-bold text-slate-400 mt-0.5 truncate">{healthStatus.detail}</p>}
            </div>
         </div>
       </div>
 
       {/* ── Primary Stats ────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <MetricCard title="Income This Cycle" amount={summary?.total_income || summary?.monthly_income || 0} subtitle="Total Inbound" icon={TrendingUp} colorClass="text-emerald-500" gradientClass="bg-emerald-50" />
-        <MetricCard title="Spent This Cycle" amount={summary?.total_expenses || summary?.monthly_expenses || 0} subtitle="Total Outbound" icon={TrendingDown} colorClass="text-rose-500" gradientClass="bg-rose-50" />
-        <MetricCard title="Net Cash Flow" amount={summary?.net_cash_flow || 0} subtitle="Surplus / Deficit" icon={Wallet} colorClass="text-blue-500" gradientClass="bg-blue-50" />
+      <div className="grid grid-cols-3 gap-3 lg:gap-6">
+        <MetricCard title="Income" amount={summary?.total_income || summary?.monthly_income || 0} subtitle="This Cycle" icon={TrendingUp} colorClass="text-emerald-500" gradientClass="bg-emerald-50" />
+        <MetricCard title="Spent" amount={summary?.total_expenses || summary?.monthly_expenses || 0} subtitle="This Cycle" icon={TrendingDown} colorClass="text-rose-500" gradientClass="bg-rose-50" />
+        <MetricCard title="Net Flow" amount={summary?.net_cash_flow || 0} subtitle="Surplus / Deficit" icon={Wallet} colorClass="text-blue-500" gradientClass="bg-blue-50" />
       </div>
 
       {/* ── Cycle Analytical Breakdown (Audit Trail) ────────────────── */}
@@ -203,7 +221,7 @@ const Dashboard = () => {
 
       {/* ── Credit Card Balance Strip ─────────────────────────── */}
       {summary?.debt_breakdown?.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
           {summary.debt_breakdown.map((d, i) => {
             const palette = ['bg-red-50','bg-blue-50','bg-amber-50','bg-purple-50'];
             const text    = ['text-red-600','text-blue-600','text-amber-600','text-purple-600'];
@@ -212,35 +230,32 @@ const Dashboard = () => {
             const cardTotalSpent = cardTxns.reduce((s, t) => s + t.amount, 0);
 
             return (
-              <div key={i} className={`${palette[i]} rounded-[2rem] p-5 border border-slate-100 flex flex-col`}>
-                <div className="mb-4">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 truncate">
+              <div key={i} className={`${palette[i]} rounded-2xl lg:rounded-[2rem] p-4 lg:p-5 border border-slate-100 flex flex-col`}>
+                <div className="mb-3">
+                  <p className="text-[9px] lg:text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 truncate">
                     {d.name.replace(' Credit Card','').replace(' Card','')}
                   </p>
-                  <p className={`text-xl font-black tracking-tight ${text[i]}`}>
+                  <p className={`text-base lg:text-xl font-black tracking-tight ${text[i]}`}>
                     {formatCurrency(d.balance)}
                   </p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Outstanding</p>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Outstanding</p>
                 </div>
-                
-                {/* Embedded Transaction List */}
-                <div className="mt-2 bg-white/60 rounded-xl p-3 flex-1 flex flex-col text-[10px]">
-                  <div className="flex justify-between items-center mb-2 pb-2 border-b border-black/5">
-                     <span className="font-black uppercase tracking-widest text-slate-500">Cycle Spend</span>
+                <div className="mt-1 bg-white/60 rounded-xl p-2 lg:p-3 flex-1 flex flex-col text-[9px] lg:text-[10px]">
+                  <div className="flex justify-between items-center mb-1.5 pb-1.5 border-b border-black/5">
+                     <span className="font-black uppercase tracking-widest text-slate-500">Cycle</span>
                      <span className={`font-black ${text[i]}`}>{formatCurrency(cardTotalSpent)}</span>
                   </div>
-                  <div className="overflow-y-auto max-h-[140px] space-y-2 pr-1 custom-scrollbar">
+                  <div className="overflow-y-auto max-h-[100px] lg:max-h-[140px] space-y-1.5 pr-1 custom-scrollbar">
                      {cardTxns.length > 0 ? cardTxns.map((t, idx) => (
-                       <div key={idx} className="flex justify-between items-start gap-2">
+                       <div key={idx} className="flex justify-between items-start gap-1">
                          <span className="font-bold text-slate-700 leading-tight truncate" title={t.description}>{t.description}</span>
                          <span className="font-black text-slate-900 shrink-0">{formatCurrency(t.amount)}</span>
                        </div>
                      )) : (
-                       <p className="text-center font-bold text-slate-400 py-6 italic uppercase tracking-widest text-[9px]">No activity</p>
+                       <p className="text-center font-bold text-slate-400 py-4 italic uppercase tracking-widest text-[8px]">No activity</p>
                      )}
                   </div>
                 </div>
-                
               </div>
             );
           })}
